@@ -99,7 +99,22 @@ Surface these options to the user with cost and decision-time impact. Don't auto
 - If days are equal, the country of *first entry* applies.
 - This matters because consulates of different Schengen countries have different processing reputations and document expectations.
 
-## 11. Visa-free travel that still requires authorisation (ETIAS, eTA, ESTA)
+## 11. Re-application after a refusal
+
+**Signal:** the user says *"I was refused last time"*, *"my application was rejected"*, or the profile's `visa_history` shows a refused entry for the same destination.
+
+**Adjustments:**
+
+- **Read the previous refusal letter first.** Schengen refusal letters list reasons by code (1–9 typically). The reason determines whether re-applying makes sense.
+- **Documentary refusals** (codes around: insufficient proof of funds, unclear purpose, missing supporting documents) → a re-application with a substantively stronger file usually has a real chance.
+- **Intent refusals** (insufficient ties to home country, doubt about intent to return) → re-applying immediately is rarely productive. Address the underlying concern (employment continuity, property, family ties) over a few months before re-applying.
+- **The application form's "previous refusals" question must be answered honestly.** Lying about prior refusals → permanent ban. Always disclose.
+- **Add a paragraph to the new cover letter** acknowledging the prior refusal and explaining what's changed since (new employment, longer banking history, additional ties). Don't bury it.
+- **Some consulates require a longer gap** between refusal and re-application — verify in research.
+
+The visa_history entry from Phase 8 Branch C should already have the refusal reason captured — use it.
+
+## 12. Visa-free travel that still requires authorisation (ETIAS, eTA, ESTA)
 
 **Signal:** the user's nationality is visa-free for the destination but mentions "ETIAS", "ESTA", "eTA", "K-ETA", or similar.
 

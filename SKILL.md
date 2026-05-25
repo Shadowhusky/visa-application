@@ -59,7 +59,7 @@ The tool caps at 4 options per question with an auto-"Other" fallback. Choose op
 
 #### Cold start (no profile found in Phase 0)
 
-Send **one** `AskUserQuestion` call with these four questions batched together:
+Send **one** `AskUserQuestion` call with the questions below. **Important:** before deciding which to include, *parse the user's initial message* for facts already given. If they said *"I need a Schengen visa to Italy from the UK, 5 days in late June"*, that's destination + origin + visa type + duration *already answered* — do NOT re-ask. Only include the questions whose answers are missing.
 
 | # | Question | header | Options |
 |---|---|---|---|
@@ -69,6 +69,8 @@ Send **one** `AskUserQuestion` call with these four questions batched together:
 | 4 | Trip duration? | `Duration` | `Under 1 week` · `1–2 weeks` · `2–4 weeks` · `Over 1 month` |
 
 If the user picks an "Other" or umbrella option, follow up with a single free-text question to clarify (e.g., "Which Schengen country specifically?" or "Which Asian country?"). Don't try to enumerate 27 Schengen members in the tool — let them type the country name.
+
+If all four facts are already in the user's initial message, skip the cold-start questions entirely and confirm in one short sentence (*"Got it — Italy Schengen tourist, ~5 days, applying from the UK. Moving on."*) before proceeding to Phase 2.
 
 After the four kickoff answers, ask one free-text follow-up for the *specific* dates (e.g., "What's the exact departure → return date range?"). Dates have unbounded answer space and aren't a good fit for the option tool.
 
@@ -402,6 +404,17 @@ Where you *do* need to involve the user:
 - Wet signatures (printed forms only)
 - CAPTCHAs and biometric prompts
 - Genuinely ambiguous declarations (e.g., "are you in possession of any weapons?" — ask once, save to profile, reuse forever)
+
+## Failure modes — how to fail gracefully
+
+Real applications hit edges. When they do, be honest and useful:
+
+- **Research finds nothing reliable.** If neither the consulate page nor the visa-centre operator lists a particular field (fee, photo spec, etc.), say so clearly: *"I couldn't find an authoritative figure for X — third-party guides say Y, but verify by emailing {consulate-email} before relying on it."* Don't invent.
+- **Online portal is down or unreachable.** Tier 1 of form-filling becomes Tier 2 or 3. Tell the user the portal isn't responding right now; offer to retry or fall back. Don't loop indefinitely.
+- **Profile file is corrupt or partially-populated.** Read what you can, ignore garbled fields, ask for missing essentials only. Don't refuse to proceed because one optional field is malformed.
+- **User's appointment is too soon.** If processing time + buffer exceeds days-until-appointment, surface this prominently and suggest either rescheduling the appointment or arranging a courier-back-to-applicant decision delivery if available.
+- **Country / route the skill has no specific knowledge of.** Fall back to the harmonised Schengen baseline (passport, photos, insurance, funds, bookings, cover letter) and tell the user "I'm working from the standard short-stay tourist visa template — verify country-specific requirements on the consulate page before submitting."
+- **User uploads something the skill can't read** (encrypted PDF, password-protected file, unreadable image). Ask the user to re-export as a standard PDF or screenshot the relevant pages. Don't fail silently.
 
 ## Things to be paranoid about
 
