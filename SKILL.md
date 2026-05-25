@@ -127,7 +127,14 @@ Documents to produce, in order:
 
 1. **Cover letter** — addressed to "Visa Section, Consulate General of {destination}, {origin city}". One page. State purpose, dates, employment, self-funding, and reference to enclosed evidence. Avoid promising things the documents don't back. See `templates/cover-letter.html`.
 2. **Employment letter** — if employed. Should be signed by manager or HR on company letterhead. Render a draft, give to user, they get it signed. See `templates/employment-letter.html`.
-3. **Filled visa application form** — strongly prefer the destination's official online portal (it issues a 2D barcode the officer can scan in seconds). If the portal exists, walk the user through it field by field using a browser MCP if available (`mcp__Claude_in_Chrome__*` if present — load via ToolSearch). Navigate to the portal, read each page, fill from the profile, take screenshots so the user can verify, and at the end click "Print" to download the generated PDF. If no portal exists, fill the standalone PDF (you can use `pymupdf` to overlay text on flat forms — pip install --break-system-packages pymupdf) or write a `application_form_data.md` sheet the user can transcribe by hand.
+3. **Filled visa application form** — the skill fills this itself. Asking the user to fill it by hand is a last resort, not the default. Follow the four-tier strategy in `references/form-filling-strategy.md`:
+
+   - **Tier 1 — Online portal.** If the destination has an official portal (Italy `e-applicationvisa.esteri.it`, France `france-visas.gouv.fr`, US DS-160 `ceac.state.gov`, etc.), load the Chrome browser MCP via ToolSearch and fill the portal page-by-page using profile data. The portal generates a PDF with a 2D barcode the officer scans. This is the cleanest output.
+   - **Tier 2 — Interactive PDF.** If no portal but the PDF has AcroForm fields (`pymupdf` detects this via `doc.is_form_pdf`), fill the named fields directly. Perfect alignment guaranteed.
+   - **Tier 3 — Vision-driven coordinate overlay.** If the PDF is flat, render the blank to PNG, use vision to read field positions, overlay text via pymupdf, **re-render and verify visually**, refine coordinates until clean. Don't stop at first attempt — inspect the result and adjust.
+   - **Tier 4 — Data sheet for manual transcription.** Only if 1–3 all fail (genuinely rare). Hand the user a one-page sheet of values to copy onto the printed form.
+
+   **Quality gate:** every tier must end with the agent visually inspecting the rendered output. Offset, overlapping, or otherwise messy PDFs are not "done" — drop down to the next tier rather than ship a poor result.
 4. **Checklist PDF (00 - CHECKLIST.pdf)** — a one-page summary the user prints as the cover sheet of the Print Pack. See `templates/checklist.html`. Include: appointment time/place, before-leaving-home tick list, the numbered stack order, likely officer questions and how to answer them, and the cross-checks you've already verified.
 
 After documents are generated, assemble the Print Pack:
@@ -150,6 +157,24 @@ Tell the user what's done, what's still pending, and what specifically to bring 
 ```
 
 Surface any inconsistency you find — better to flag a date mismatch now than have the officer find it.
+
+## The "do, don't ask" principle
+
+Throughout the workflow, default to acting. The user has limited time and wants the application *done*, not narrated.
+
+- **Don't ask for data you can extract.** If the user uploads a passport scan, read the bio page yourself — don't ask "what's your passport number?"
+- **Don't ask the user to fill the form.** Use the 4-tier strategy above.
+- **Don't ask the user to search for hotels / flights** — they already have these as PDFs in their email. Ask them to drop the confirmations in, then extract the relevant fields yourself.
+- **Don't ask the user to "verify" things you can verify yourself.** Cross-check passport DOB against profile DOB, flight dates against hotel dates, employer address against payslip header — automatically, in the background. Only surface the *discrepancies*, not the matches.
+- **Don't ask the user where to put files.** Default to `~/Documents/Visa Applications/{Country}-{Year}/` and only ask if the user previously indicated a different location.
+- **Don't pause to confirm trivial decisions.** Don't ask "should I generate the cover letter now?" — just generate it. Surface a summary at the end, not a confirmation at every step.
+
+Where you *do* need to involve the user:
+
+- Payments (card details — never enter on user's behalf)
+- Wet signatures (printed forms only)
+- CAPTCHAs and biometric prompts
+- Genuinely ambiguous declarations (e.g., "are you in possession of any weapons?" — ask once, save to profile, reuse forever)
 
 ## Things to be paranoid about
 
@@ -175,6 +200,7 @@ Also update `~/.claude/visa-history.json` with a summary of what was applied for
 - `references/document-checklist.md` — standard document lists by visa type
 - `references/known-portals.md` — known online application portals + country quirks
 - `references/profile-schema.md` — the visa-profile.json schema
+- `references/form-filling-strategy.md` — the 4-tier strategy for filling application forms without bothering the user
 - `templates/cover-letter.html` — letter template, A4 single page
 - `templates/employment-letter.html` — letter template, A4 single page
 - `templates/checklist.html` — Print Pack cover-sheet checklist

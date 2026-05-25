@@ -42,7 +42,7 @@ You:    [signs, prints, walks in]
 ## What you get
 
 - A reusable profile at `~/.claude/visa-profile.json` — passport, address, employer, banking. Built once, replayed forever.
-- A document pack — cover letter, employment letter draft, filled application form (via the destination's online portal where one exists, complete with 2D barcode), checklist PDF.
+- A document pack — cover letter, employment letter draft, filled application form, checklist PDF. The skill fills the form itself: via the destination's online portal where one exists (with 2D barcode), directly into the PDF for interactive forms, or vision-aligned overlay for flat PDFs — manual transcription only as a last resort.
 - A numbered Print Pack folder in officer flip-order. Print A4, sign, walk in.
 
 ## Install
