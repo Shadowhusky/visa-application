@@ -1,12 +1,12 @@
 # Known Online Application Portals + Country Quirks
 
-Updated 2026-05. **Verify** before relying on any URL — portals move.
+Last reviewed 2026-05-26. **Verify** before relying on any URL — portals move.
 
 ## Online application portals
 
 | Destination | Portal | Notes |
 |---|---|---|
-| **Italy** (Schengen + national) | `https://e-applicationvisa.esteri.it/` | Generates a printable form with 2D barcode. Goes fully mandatory 1 Jun 2026. Output accepted at all VFS Italy centres worldwide. |
+| **Italy** (Schengen + national) | `https://e-applicationvisa.esteri.it/` | Generates a printable form with 2D barcode. **Fully mandatory from 1 June 2026** (no paper alternative for applications submitted on or after that date). Output accepted at all VFS Italy centres worldwide. |
 | **France** (Schengen + national) | `https://france-visas.gouv.fr/` | Mandatory. End-to-end online application with fee payment, then in-person at TLScontact. |
 | **Germany** (Schengen) | `https://videx.diplo.de/` | VIDEX portal. Output is a PDF you print and sign. |
 | **Spain** (Schengen) | Spanish consulates use BLS in most countries; each consulate publishes its own form. No nationwide portal yet. |

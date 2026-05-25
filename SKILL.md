@@ -450,3 +450,5 @@ Also update `~/.claude/visa-history.json` with a summary of what was applied for
 | `scripts/render-pdf.sh` | HTML → PDF via Chrome headless |
 | `scripts/find-existing.sh` | Search the user's machine for existing profile / folder |
 | `scripts/build-print-pack.sh` | Assemble the numbered Print Pack |
+| `tests/smoke-test.sh` | Structural sanity check (file presence, executable scripts, no leaked personal data, render pipeline) |
+| `tests/scenarios.md` | Ten end-to-end behavioural scenarios with expected agent responses |

@@ -14,14 +14,31 @@ The default workflow assumes a first-time tourist applicant. Real life is messie
 
 ## 2. Family applications (spouse, children, parents)
 
-**Signal:** "we", "my wife and I", "with my kids".
+**Signal:** "we", "my wife and I", "with my kids", "for me and my husband", "travelling as a family".
 
-**Adjustments:**
-- One application *per person*, even infants. Each gets a profile (or sub-profile).
-- Children need both parents' passport copies and consent letter if travelling without one parent.
-- Marriage certificates required for spouse, translated and (sometimes) apostilled.
-- Fund minimum is per-person × number of travellers.
-- Some consulates accept a single appointment for the whole family; others require separate slots — check.
+**Adjustments to the workflow:**
+
+- **One application *per person*, even infants.** Each applicant gets a separate form, separate fee, separate biometrics. There is no "family application" as such.
+- **One profile per applicant.** Store them at `~/.claude/visa-profile.json` (the main applicant) plus `~/.claude/visa-profile.{name}.json` for each family member, OR — preferred for couples and immediate family — extend the main profile with a `family_members[]` array. Either way, each form-fill iteration loops over the applicants.
+- **Shared documents** the skill should produce once and reference per-applicant:
+  - One cover letter mentioning all travellers and their relationship
+  - One travel insurance policy that lists every named insured (most policies allow this; verify policy schedule)
+  - Hotel + flight bookings on a single PNR — but the visa form's "accommodation" field is repeated per applicant
+- **Per-applicant documents** the skill must produce *N* copies of:
+  - The visa application form itself
+  - Cover letter (or appended page to the family cover letter naming each applicant)
+  - Employment letter (per working adult; school letter per minor)
+  - Bank statements + payslips (joint accounts cover both spouses; minors covered by parent's funds)
+  - Photos: 2 per person, all to the same spec
+- **Children:**
+  - Birth certificate (translated + apostilled/legalised if not in English/Italian)
+  - Both parents' passport copies
+  - **Consent letter from the absent parent** if travelling with only one — notarised
+  - School / college attendance letter if of school age
+- **Spouse:** marriage certificate (translated + legalised if not in the consulate's language).
+- **Funds:** the per-day minimum is *per applicant × days*. Italy's €269.60 for a 5-day trip becomes €1078.40 for a family of four — make sure proof of funds reflects this. Joint bank statements are fine but the total balance is what matters.
+- **Appointment:** some consulates book one slot for the family, some require one per person — verify in Phase 4 research.
+- **Print Pack assembly:** one numbered Print Pack folder per applicant inside the main application folder (e.g., `Italy-2026/Print Pack - {Name}/`), or one shared pack with a per-applicant section divider. Per-applicant folders are clearer at the desk.
 
 ## 3. Business / conference travel
 
