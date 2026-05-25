@@ -37,12 +37,13 @@ Material claims to cross-validate:
 
 **Always check the published / updated date** of every source. Treat anything older than 18 months as suspicious; anything older than 3 years as wrong-by-default.
 
-Specific watch-outs that may affect rules **today**:
-- **EES (EU Entry/Exit System)** — live since 12 Oct 2025 across the Schengen area. First crossing captures biometrics at the border instead of stamping. Affects user experience at arrival, not the visa application itself.
-- **ETIAS (EU Travel Information and Authorisation System)** — visa-free nationals will need ETIAS authorisation for Schengen. Phased rollout late 2026 onward. Doesn't apply to visa-required nationals (they already need a visa), but verify the user's situation.
-- **Italy digital visa portal** — fully online for new applications from 1 Jun 2026. Applicants before that date are on the legacy paper track.
-- **UK eVisa transition** — UK has been retiring physical BRPs (Biometric Residence Permits) for eVisa accounts at gov.uk since 2024. UK residents proving status to other countries' consulates should use a "share code" (gov.uk/view-and-prove-your-immigration-status) or the "View your immigration status" PDF, not an old BRP.
-- **US visa interview waiver** — eligibility criteria for the dropbox / interview waiver have tightened multiple times. Check current rules.
+Specific watch-outs that may affect rules **today** (last reviewed 2026-05-26):
+
+- **EES (EU Entry/Exit System)** — live since 12 Oct 2025 across the Schengen area, mature by now (~7 months in). First crossing captures biometrics at the border instead of stamping. Affects user experience at arrival, not the visa application itself.
+- **ETIAS (EU Travel Information and Authorisation System)** — visa-free nationals will need ETIAS authorisation for Schengen. Phased rollout from late 2026. Doesn't apply to visa-required nationals (they already need a visa), but verify the user's situation if they hold a passport that's normally Schengen-exempt.
+- **Italy digital visa portal goes fully mandatory on 1 June 2026** — that's imminent. Applications submitted on or after that date use `e-applicationvisa.esteri.it` end-to-end (no paper alternative). Anyone with an appointment in the last days of May is on the legacy paper track; anyone booking from June onward is on the new system. Verify the cutover applies to the applicant's specific consulate; some may run a transitional period.
+- **UK eVisa transition** — UK has been retiring physical BRPs (Biometric Residence Permits) for eVisa accounts at gov.uk since 2024; transition largely complete by mid-2026. UK residents proving status to other countries' consulates should use a "share code" (gov.uk/view-and-prove-your-immigration-status) or the "View your immigration status" PDF, not an old BRP.
+- **US visa interview waiver** — eligibility criteria for the dropbox / interview waiver have tightened multiple times since 2024. Always check the most recent embassy page, not a guide more than 6 months old.
 
 ## How to search
 
