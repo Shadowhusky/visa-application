@@ -1,8 +1,4 @@
 <p align="center">
-  <img src="assets/icon.png" alt="visa-application icon" width="96" height="96" />
-</p>
-
-<p align="center">
   <img src="assets/banner.png" alt="visa-application banner" />
 </p>
 
