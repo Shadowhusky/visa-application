@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<!--
+  Print Pack checklist — the 00 cover sheet.
+  Replace ALL_CAPS placeholders. STACK_ORDER_ROWS_PLACEHOLDER gets the dynamic file list.
+  Q&A and cross-checks are per-application — fill them in.
+-->
+<html>
+<head>
+<meta charset="utf-8">
+<title>Visa Appointment — Checklist</title>
+<style>
+@page { size: A4; margin: 14mm 16mm 14mm 16mm; }
+html, body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 10pt; line-height: 1.4; color: #111;
+  margin: 0; padding: 0;
+}
+h1 { font-size: 18pt; margin: 0 0 2pt 0; letter-spacing: 0.3pt; }
+.meta { font-size: 10.5pt; color: #333; margin-bottom: 10pt; }
+.meta strong { color: #000; }
+hr { border: 0; border-top: 1px solid #aaa; margin: 8pt 0; }
+h2 {
+  font-size: 11.5pt;
+  margin: 10pt 0 4pt 0;
+  padding-bottom: 2pt;
+  border-bottom: 1px solid #333;
+  text-transform: uppercase;
+  letter-spacing: 0.8pt;
+}
+.checklist { list-style: none; padding: 0; margin: 0 0 8pt 0; }
+.checklist li {
+  position: relative;
+  padding-left: 18pt;
+  margin-bottom: 3.5pt;
+}
+.checklist li::before {
+  content: "☐";
+  position: absolute; left: 0; top: -1pt;
+  font-size: 13pt;
+}
+.checklist li.warn::before { content: "⚠"; color: #c25c00; }
+table { border-collapse: collapse; width: 100%; margin: 4pt 0 8pt 0; font-size: 9.5pt; }
+th, td { text-align: left; padding: 3pt 6pt; border-bottom: 1px solid #ddd; vertical-align: top; }
+th { background: #f4f4f4; font-weight: 600; }
+td.num { width: 28pt; font-weight: 600; color: #555; }
+td.note { color: #555; font-size: 9pt; }
+.qa { margin: 0 0 8pt 0; }
+.qa .q { font-weight: 600; }
+.qa .a { color: #444; margin-left: 8pt; }
+.row { display: flex; gap: 14pt; }
+.col { flex: 1; }
+.banner {
+  background: #fff5ea;
+  border-left: 3pt solid #c25c00;
+  padding: 6pt 10pt;
+  margin: 6pt 0 8pt 0;
+  font-size: 10pt;
+}
+.banner b { color: #7a3a00; }
+.footer {
+  margin-top: 12pt;
+  font-size: 8.5pt; color: #777;
+  text-align: center;
+  border-top: 1px solid #ddd; padding-top: 6pt;
+}
+</style>
+</head>
+<body>
+
+<h1>Visa Appointment — Checklist</h1>
+<div class="meta">
+  <strong>APPOINTMENT_DATETIME</strong> · VISA_CENTRE_NAME, VISA_CENTRE_ADDRESS · <strong>Arrive by ARRIVAL_TIME</strong>
+</div>
+<hr>
+
+<h2>Before leaving home</h2>
+<ul class="checklist">
+  <li>All NN docs printed single-sided on A4, stacked in numbered order</li>
+  <li class="warn"><b>File 02</b> — visa form — <b>signed</b> (Place & date: <i>APPOINTMENT_CITY, APPOINTMENT_DATE_SHORT</i>)</li>
+  <li class="warn"><b>File 03</b> — cover letter — <b>signed at bottom</b></li>
+  <li>Barcode on the application form not folded or damaged (if portal-generated)</li>
+  <li>Physical passport in bag (not inside folder)</li>
+  <li>2 biometric photos paperclipped to file 04 (or as specified for destination)</li>
+  <li>Card + cash for the visa fee (VISA_FEE_LOCAL)</li>
+  <li>Phone (digital backups of insurance + hotel emails)</li>
+</ul>
+
+<h2>Stack order — files in Print Pack/</h2>
+<table>
+<tr><th>#</th><th>Document</th><th>Notes</th></tr>
+<!-- STACK_ORDER_ROWS_PLACEHOLDER -->
+</table>
+
+<div class="row">
+<div class="col">
+
+<h2>Likely officer questions</h2>
+<!-- QA_ROWS_PLACEHOLDER -->
+
+</div>
+<div class="col">
+
+<h2>Cross-checks — verified</h2>
+<ul class="checklist">
+<!-- CROSSCHECK_ROWS_PLACEHOLDER -->
+</ul>
+
+</div>
+</div>
+
+<div class="footer">APPLICANT_FULL_NAME · Passport PASSPORT_NUMBER · Ref APPLICATION_REF</div>
+
+</body>
+</html>

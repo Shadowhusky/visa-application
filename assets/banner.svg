@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 500" width="1600" height="500">
+  <!-- 极简 banner: white background, single horizontal rule, name in mono, small passport mark on the right -->
+  <rect width="1600" height="500" fill="#ffffff"/>
+
+  <!-- thin horizontal rule near the top, far edge to far edge -->
+  <line x1="120" y1="100" x2="1480" y2="100" stroke="#111111" stroke-width="2"/>
+
+  <!-- small all-caps tag above the title -->
+  <text x="120" y="84"
+        font-family="ui-monospace, SFMono-Regular, Menlo, monospace"
+        font-size="20" fill="#666666" letter-spacing="6">
+    CLAUDE / SKILL
+  </text>
+
+  <!-- main title -->
+  <text x="120" y="270"
+        font-family="ui-sans-serif, system-ui, -apple-system, 'Helvetica Neue', Helvetica, Arial, sans-serif"
+        font-size="116" font-weight="500" fill="#111111" letter-spacing="-3">
+    visa-application
+  </text>
+
+  <!-- subtitle -->
+  <text x="120" y="350"
+        font-family="ui-sans-serif, system-ui, -apple-system, 'Helvetica Neue', Helvetica, Arial, sans-serif"
+        font-size="30" font-weight="300" fill="#444444">
+    any visa · any country · officer-ready pack in one session
+  </text>
+
+  <!-- bottom horizontal rule -->
+  <line x1="120" y1="410" x2="1480" y2="410" stroke="#111111" stroke-width="2"/>
+
+  <!-- right-side mark: a small passport silhouette -->
+  <g transform="translate(1280, 140)">
+    <rect x="0" y="0" width="120" height="170" rx="4" ry="4"
+          fill="none" stroke="#111111" stroke-width="6"/>
+    <line x1="0" y1="20" x2="120" y2="20" stroke="#111111" stroke-width="4"/>
+    <circle cx="78" cy="115" r="26" fill="none" stroke="#111111" stroke-width="5"/>
+    <line x1="14" y1="62" x2="74" y2="62" stroke="#111111" stroke-width="4" stroke-linecap="round"/>
+    <line x1="14" y1="78" x2="60" y2="78" stroke="#111111" stroke-width="4" stroke-linecap="round"/>
+    <line x1="14" y1="94" x2="50" y2="94" stroke="#111111" stroke-width="4" stroke-linecap="round"/>
+  </g>
+</svg>

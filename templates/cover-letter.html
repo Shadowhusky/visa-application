@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<!--
+  Cover letter template for any visa application.
+  Replace ALL_CAPS placeholders before rendering.
+  Render with: bash scripts/render-pdf.sh templates/cover-letter.html out.html "/path/Cover Letter.pdf"
+  (Or substitute placeholders in a temp HTML first.)
+-->
+<html>
+<head>
+<meta charset="utf-8">
+<title>Cover Letter — APPLICANT_FULL_NAME</title>
+<style>
+@page { size: A4; margin: 25mm 25mm 25mm 25mm; }
+html, body {
+  font-family: "Times New Roman", Times, serif;
+  font-size: 11.5pt;
+  line-height: 1.5;
+  color: #000;
+  margin: 0; padding: 0;
+}
+.sender { margin-bottom: 18pt; line-height: 1.35; }
+.sender .name { font-weight: bold; }
+.date { margin-bottom: 14pt; }
+.recipient { margin-bottom: 14pt; line-height: 1.35; }
+.recipient .name { font-weight: bold; }
+.subject { font-weight: bold; margin-bottom: 14pt; }
+p { margin: 0 0 11pt 0; text-align: justify; }
+.signature { margin-top: 26pt; }
+.signature .name { font-weight: bold; }
+strong { font-weight: bold; }
+</style>
+</head>
+<body>
+
+<div class="sender">
+<span class="name">APPLICANT_FULL_NAME</span><br>
+APPLICANT_ADDRESS_LINE_1<br>
+APPLICANT_ADDRESS_LINE_2<br>
+APPLICANT_CITY, APPLICANT_POSTCODE<br>
+APPLICANT_COUNTRY
+</div>
+
+<div class="date">LETTER_DATE</div>
+
+<div class="recipient">
+<span class="name">Consulate General of DESTINATION_COUNTRY</span><br>
+Visa Section, CONSULATE_CITY
+</div>
+
+<div class="subject">Subject: VISA_TYPE Visa Application &mdash; APPLICANT_FULL_NAME</div>
+
+<p>Dear Sir/Madam,</p>
+
+<p>I am writing to apply for a VISA_TYPE visa for my upcoming TRIP_PURPOSE to DESTINATION_COUNTRY from <strong>TRIP_START_DATE to TRIP_END_DATE</strong>.</p>
+
+<p>I currently live in APPLICANT_COUNTRY on a APPLICANT_RESIDENCE_STATUS and work full-time as a APPLICANT_ROLE at APPLICANT_EMPLOYER. EMPLOYMENT_SENTENCE.</p>
+
+<!-- Optional: itinerary or transport sentence -->
+<p>ITINERARY_OR_TRANSPORT_SENTENCE</p>
+
+<p>I am fully self-funding this trip. Please find enclosed all required documents, including my employment letter, bank statements, payslips, and confirmed travel and accommodation bookings.</p>
+
+<p>Thank you for your time and assistance.</p>
+
+<p>Sincerely,</p>
+
+<div class="signature">
+<span class="name">APPLICANT_FULL_NAME</span>
+</div>
+
+</body>
+</html>

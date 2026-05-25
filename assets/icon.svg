@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- 极简 visa skill icon: passport silhouette with a single circular stamp -->
+  <rect width="512" height="512" fill="#ffffff"/>
+
+  <!-- passport body -->
+  <rect x="138" y="80" width="236" height="340" rx="8" ry="8"
+        fill="none" stroke="#111111" stroke-width="14"/>
+
+  <!-- inner spine line -->
+  <line x1="138" y1="112" x2="374" y2="112" stroke="#111111" stroke-width="8"/>
+
+  <!-- stamp circle, slightly offset, suggests a visa stamp -->
+  <circle cx="324" cy="290" r="56" fill="none" stroke="#111111" stroke-width="10"/>
+
+  <!-- horizontal bars (the "lines of text" on the page) -->
+  <line x1="170" y1="200" x2="290" y2="200" stroke="#111111" stroke-width="8" stroke-linecap="round"/>
+  <line x1="170" y1="232" x2="260" y2="232" stroke="#111111" stroke-width="8" stroke-linecap="round"/>
+  <line x1="170" y1="264" x2="240" y2="264" stroke="#111111" stroke-width="8" stroke-linecap="round"/>
+</svg>
