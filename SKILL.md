@@ -9,15 +9,9 @@ A general-purpose workflow for assembling a complete, officer-ready visa applica
 
 ## Why this skill exists
 
-Visa applications are high-stakes, high-paperwork, and rules drift. Most applicants either over-search and waste days, or under-search and get rejected on a single missing line. This skill standardises the workflow:
+Visa applications are high-stakes, high-paperwork, and rules drift. Most applicants either over-search and waste days, or under-search and get rejected on a single missing line. This skill standardises the workflow: capture the few things only the user knows, look up the rest from official sources, cross-validate, generate every document the consulate actually wants in the order they want it, persist what's reusable, and pick up the thread on subsequent invocations all the way through to granted-visa capture.
 
-1. **Capture the few things only the user knows** (destination, dates, employment) up front, in a single Q&A turn.
-2. **Look up the rest from official sources** — consulate page first, visa-centre operator (VFS/TLS/BLS) second, recent third-party guides only as a sanity check.
-3. **Cross-validate** because consulate sites are often stale and third-party guides are often wrong.
-4. **Generate every document the consulate actually wants**, in the order they want it, in a folder ready to print.
-5. **Persist what is reusable** — passport, address, employer, banking — so the next application takes 45 minutes, not 5 days.
-
-Accuracy is the principal currency here. If a fact disagrees between two sources, surface the disagreement to the user — don't paper over it.
+Accuracy is the principal currency. If a fact disagrees between two sources, surface the disagreement to the user — don't paper over it.
 
 ## When to invoke
 
@@ -150,13 +144,56 @@ Inside the application folder, you'll later create:
 ├── Cover Letter.pdf
 ├── Employment Letter.pdf            (if employed)
 ├── Visa-application-form-FILLED.pdf (if portal exists) or application_form_data.md
-├── application_status.md             (running checklist)
+├── application_status.md             (running state — schema below)
 ├── (user-provided documents the user drops in)
 └── Print Pack/
     ├── 00 - CHECKLIST.pdf
     ├── 01 - …
     └── …
 ```
+
+#### `application_status.md` schema
+
+This file is the source of truth for multi-session continuity. Phase 0 reads it via the folder search; Phase 1's "Continue" branch resumes from it; Phase 7 writes to it; Phase 8 reads it to decide which post-submission branch to enter. Use this exact markdown structure (human-readable, machine-parseable enough for the agent):
+
+```markdown
+# Application status
+
+- **Status:** in_progress | submitted | awaiting_decision | granted | refused
+- **Destination:** Italy
+- **Visa type:** Schengen Tourist (Type C)
+- **Trip dates:** 2026-06-22 → 2026-06-26
+- **Last updated:** 2026-05-25
+
+## Appointment
+- **Date/time:** 2026-05-27 09:45
+- **Centre:** VFS Italy London
+- **Address:** Ground Floor, 8-20 Pocock St, London SE1 0BW
+- **Reference:** ITA122217594459
+- **Tracking URL:** https://visa.vfsglobal.com/gbr/en/ita/track-application
+
+## Progress checklist
+- [x] Research complete
+- [x] Profile loaded
+- [x] Documents uploaded by user
+- [x] Appointment booked
+- [x] Visa application form filled
+- [x] Cover letter generated
+- [x] Print Pack assembled
+- [ ] Submitted at centre
+- [ ] Decision received
+
+## Outcome
+*(filled in Phase 8 when granted or refused)*
+- **Decided on:** —
+- **Visa sticker number:** —
+- **Valid:** —
+- **Entries:** —
+- **Days of stay:** —
+- **Notes:** —
+```
+
+Keep this file updated at the end of every phase that changes state. Re-write the whole file (not just append) so it remains a clean snapshot.
 
 ### Phase 4 — Research current official requirements
 
@@ -288,7 +325,9 @@ Write the same content to `{application-folder}/application_status.md` so the ne
 
 The workflow doesn't end when the user walks out of the visa centre. Applications take days to weeks to decide, and the skill needs to be able to pick up the thread on a later invocation.
 
-**Trigger:** if Phase 0 finds a profile AND an application folder whose `application_status.md` shows status `submitted` or `awaiting_decision`, the warm-start question shifts to:
+**Trigger detection:** during Phase 0, after `find-existing.sh folder` returns a path, read that folder's `application_status.md`. If the `Status:` field is `submitted` or `awaiting_decision` or `granted` or `refused`, Phase 1's warm-start question shifts from the standard "Continue/New/Update" to the post-submission variant below.
+
+**Warm-start question (post-submission variant):**
 
 | Question | header | Options |
 |---|---|---|
