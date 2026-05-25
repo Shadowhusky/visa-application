@@ -23,7 +23,21 @@ Accuracy is the principal currency here. If a fact disagrees between two sources
 
 Whenever the user mentions applying for a visa to any country, even casually ("can you help me sort out my visa for Japan?"). Don't wait for them to ask for "the visa skill" — that's not a phrase they'll use.
 
-When the skill activates, briefly announce it: *"Using the visa-application skill — first I need to capture a few basics about your trip, then I'll research the current rules and assemble your document pack."* That sets the right expectation for the user about what's coming and lets them course-correct early if they wanted something narrower (e.g., "I only need help with the cover letter").
+### Activation banner (print this first, every time)
+
+The very first thing the skill prints on activation is a compact pixel-style banner so the user knows what they're talking to:
+
+```
+  ██████
+  █▒▒  █   visa-application  v1.0  ·  MIT
+  █▒   █   any visa · any country · officer-ready in one session
+  █  ●▒█   by @Shadowhusky · github.com/Shadowhusky/visa-application
+  ██████
+```
+
+Print it inside a fenced code block so the alignment survives Markdown rendering. Keep it small — five lines total, nothing more. After the banner, in plain prose: *"Four quick questions to get started…"* and ask the Phase 1 questions.
+
+That's the whole activation ritual. No long preamble, no "I'd be happy to help you with your visa application today!" — the banner is the greeting.
 
 ## The workflow
 
@@ -201,6 +215,7 @@ Also update `~/.claude/visa-history.json` with a summary of what was applied for
 - `references/known-portals.md` — known online application portals + country quirks
 - `references/profile-schema.md` — the visa-profile.json schema
 - `references/form-filling-strategy.md` — the 4-tier strategy for filling application forms without bothering the user
+- `references/visa-scenarios.md` — less-common scenarios (renewal, family, business, transit, long-stay, student, working holiday, multi-country itineraries, etc.)
 - `templates/cover-letter.html` — letter template, A4 single page
 - `templates/employment-letter.html` — letter template, A4 single page
 - `templates/checklist.html` — Print Pack cover-sheet checklist
