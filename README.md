@@ -2,6 +2,8 @@
   <img src="assets/banner.png" alt="visa-application" />
 </p>
 
+<p align="center"><sub><em>icon &amp; banner are placeholders — regenerate with the prompts in <a href="assets/PROMPTS.md">assets/PROMPTS.md</a></em></sub></p>
+
 A Claude Code skill that takes you from "I need a visa" to a printed, officer-ready document pack — without you spending a week reading consulate websites that contradict each other.
 
 ## What it solves
