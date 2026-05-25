@@ -20,13 +20,29 @@ Updated 2026-05. **Verify** before relying on any URL — portals move.
 
 ## Common visa-centre operators
 
+These domains also handle **appointment booking** — usually a "Book an appointment" or "Schedule an appointment" link near the top of the per-country page.
+
 | Operator | Destinations they handle (examples) | URL pattern |
 |---|---|---|
 | **VFS Global** | Italy, UK, Germany, Spain, Australia, Saudi Arabia, India, South Africa, many more | `visa.vfsglobal.com/{country-code}/{lang}/{destination}` |
 | **TLScontact** | France, China (from UK), Sweden, Switzerland (some routes) | `{destination-cc}.tlscontact.com` |
 | **BLS International** | Spain (most countries), Portugal, India | `blsinternational.com` |
 | **VFS Tasheel** | UAE | `vfstasheel.com` |
-| **CGI Federal** | US (some countries) | `ustraveldocs.com` |
+| **CGI Federal** | US (most countries) | `ustraveldocs.com` (form → fee → schedule interview) |
+
+## Appointment booking — country flow specifics
+
+| Destination | Booking flow |
+|---|---|
+| **Italy / Schengen** | Choose centre → category → slot → optional Prime Time/Premium add-ons → pay VFS service fee. CAPTCHA at slot-selection step. Reschedule allowed once free. |
+| **France** | Booked *as part of* the France-visas.gouv.fr application — no separate TLS booking step. |
+| **Germany** | Many consulates use `service2.diplo.de` for booking (separate from the VIDEX form portal). |
+| **United States** | DS-160 → MRV fee (~$185 B1/B2) → schedule interview at `ustraveldocs.com`. Three sequential steps, can take ~30 min total. |
+| **United Kingdom** | gov.uk online application → pay (£127 standard) → book biometrics through UKVCAS / VFS / TLScontact within ~30 days. |
+| **Canada** | Apply on IRCC → biometrics letter issued → book at VFS within 30 days. |
+| **China** | Apply on COVA → print confirmation → walk in or book at CVASC. |
+| **Japan** | Embassy of Japan UK accepts walk-in for some routes; others need appointment via VFS Japan. |
+| **Australia** | Mostly fully-online; biometrics required only for some nationalities, booked at VFS. |
 
 ## Country-specific quirks worth knowing
 

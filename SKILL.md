@@ -51,7 +51,7 @@ No prose between steps. No "I'd be happy to help" preamble. No "Let me check…"
 
 ## The workflow
 
-The skill runs in seven phases in **strict order**. Do not skip Phase 0. Do not list options in prose when the AskUserQuestion tool can be used. The same invocation should produce the same workflow every time — that's the whole point of having a skill.
+The skill runs in eight phases in **strict order**. Do not skip Phase 0. Do not list options in prose when the AskUserQuestion tool can be used. The same invocation should produce the same workflow every time — that's the whole point of having a skill.
 
 ### Phase 0 — Searches (silent, part of the activation ritual)
 
@@ -86,7 +86,7 @@ Skip the 4-question kickoff entirely. The profile already has identity, residenc
 |---|---|---|
 | Profile found ({last_updated}). What would you like to do? | `Next step` | `Continue existing application` (only if a relevant folder was found) · `Start new application to a different country` · `Update my profile (employer, address, etc.)` · `Something else` |
 
-Branch the rest of the workflow based on the answer. If "Continue", jump straight to Phase 6 cross-checks. If "Start new", do the 4-question kickoff to get destination/dates. If "Update", ask what specifically changed.
+Branch the rest of the workflow based on the answer. If "Continue", jump straight to Phase 7 cross-checks. If "Start new", do the 4-question kickoff to get destination/dates. If "Update", ask what specifically changed.
 
 #### When the user declines / cancels the structured question
 
@@ -153,7 +153,65 @@ This is the part where accuracy matters most. Read `references/research-protocol
 
 See `references/known-portals.md` for known online application portals (Italy `e-applicationvisa.esteri.it`, US `ceac.state.gov` DS-160, UK `gov.uk/standard-visitor`, etc.) and `references/document-checklist.md` for typical document lists by visa type — both as starting points, not gospel; always re-verify online.
 
-### Phase 5 — Generate documents + assemble Print Pack
+### Phase 5 — Book or capture the appointment
+
+The visa appointment is the timeline anchor. Every document has to be ready before this date, and most countries require the appointment to be booked *before* generating the application form (the form often references the appointment number). It's also a common user blind spot — they assume "the visa centre will fit me in next week" and discover slots are 4–6 weeks out. So the skill asks early.
+
+**Send one `AskUserQuestion`:**
+
+| Question | header | Options |
+|---|---|---|
+| Have you already booked your visa appointment? | `Appointment` | `Yes, already booked` · `No, need to book now` · `Not sure — let me check my email` · `Not required for this visa type` |
+
+#### Branch A — "Yes, already booked"
+
+Capture the appointment details (free-text follow-up): date, time, visa centre / consulate, address, reference number. Read any confirmation PDF the user drops in. Save into the application folder and into the profile's `current_application.appointment` block.
+
+These details are used in Phase 6 (Cover Letter mentions the appointment date) and Phase 7 (the Checklist PDF prints them as the cover sheet).
+
+#### Branch B — "No, need to book now"
+
+Walk the user through booking, end-to-end, via the browser MCP. Generic flow:
+
+1. Open the official booking URL for `{destination}` from `{origin}` (see `references/known-portals.md`).
+2. Select **service category** (Tourist / Business / Study / Other — match the visa type from Phase 1).
+3. Select **applicant centre / city** — closest to the user's address from the profile.
+4. Look at the available slots. **Recommend a date that gives at least:**
+   - The consulate's documented **processing time** + a 5–7 day buffer, before the trip departure date.
+   - At least 7–10 days from today (so the user has time to print and sign documents).
+5. Fill the personal details from the profile (passport number, contact details, etc.).
+6. **Stop at the payment step.** The user enters card details themselves — the skill *never* enters payment info, full stop.
+7. After the user confirms, capture: date/time, reference number, address, and any confirmation PDF the portal generates.
+
+**Country-specific nuances** (see `references/known-portals.md` for full list):
+
+- **US (B1/B2):** DS-160 form → MRV fee payment → schedule interview at `ustraveldocs.com`. Three sequential steps, not one — the skill walks the user through each.
+- **Schengen via VFS:** select destination → category → centre → slot → optional priority/premium add-ons → pay. CAPTCHA is common at slot-selection — user solves it.
+- **France via TLScontact:** the France-visas portal *creates the TLS appointment slot* as part of the application — no separate booking step.
+- **UK Visitor:** book biometrics appointment via UKVCAS / VFS after submitting the gov.uk application.
+
+#### Branch C — "Not sure"
+
+Help the user check. Common places appointments hide:
+- Email search for "{destination}", "VFS", "TLScontact", "BLS", or "appointment confirmation"
+- Visa-centre account on the operator's website (login + dashboard)
+- Calendar entries near the trip date
+
+If found, treat as Branch A. If not found, treat as Branch B.
+
+#### Branch D — "Not required"
+
+Some categories don't need an in-person appointment (Australia visas done entirely online, some Caribbean nations, ETIAS/ETA-style authorisations). Verify against the Phase 4 research — if the research already confirmed appointment-free, proceed straight to Phase 6 without further questions.
+
+#### Timing cross-check (automatic, every branch)
+
+After Phase 5 settles an appointment date, automatically check:
+
+- **Appointment ≥ trip-departure − consulate processing time − 7-day buffer.** If not, flag clearly.
+- **Documents won't be too stale:** payslips and bank statements should be < 30 days old at submission. If the appointment is unusually far in the future, warn that documents may need to be re-issued.
+- **Peak-season risk:** summer Schengen (June–August), Chinese New Year, Hajj season, US Thanksgiving/Christmas all create backlogs. Surface if relevant.
+
+### Phase 6 — Generate documents + assemble Print Pack
 
 For each document type, prefer the proven approach — render HTML via Chrome headless to PDF.
 
@@ -185,7 +243,7 @@ bash scripts/build-print-pack.sh "{application-folder}"
 
 This copies (not moves — keep originals) each PDF into a `Print Pack/` subfolder with a numbered, human-readable prefix in the order an officer flips through them.
 
-### Phase 6 — Final cross-check report
+### Phase 7 — Final cross-check report
 
 Tell the user what's done, what's still pending, and what specifically to bring to the appointment. Use this exact template:
 
@@ -242,6 +300,7 @@ Also update `~/.claude/visa-history.json` with a summary of what was applied for
 - `references/profile-schema.md` — the visa-profile.json schema
 - `references/form-filling-strategy.md` — the 4-tier strategy for filling application forms without bothering the user
 - `references/visa-scenarios.md` — less-common scenarios (renewal, family, business, transit, long-stay, student, working holiday, multi-country itineraries, etc.)
+- `references/known-portals.md` also contains the appointment-booking flow per destination (URL, steps, fees, common quirks)
 - `templates/cover-letter.html` — letter template, A4 single page
 - `templates/employment-letter.html` — letter template, A4 single page
 - `templates/checklist.html` — Print Pack cover-sheet checklist
