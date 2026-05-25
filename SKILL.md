@@ -56,9 +56,23 @@ bash scripts/find-existing.sh profile
 
 This searches: `~/.claude/`, `~/Documents/`, `~/Desktop/`, iCloud Drive's `Documents/` and `Travel/`, and prints anything matching `*visa-profile*.json` or `*personal_profile*.json`.
 
-**If found**: read it, summarise to the user ("I found your profile — you're Yuxuan Liao, Chinese passport EJ3963586, employed at Thema AI in London at £65k. Anything changed since {date}?"), and proceed.
+**If found**: read it, summarise the headline identity to the user in one sentence, and ask "anything changed since {last_updated}?"
 
-**If not found**: capture the data from the user (see `references/profile-schema.md` for the full schema), write to the canonical location, and proceed. Don't ask for everything in one go — ask only what's needed for *this* application, mark the rest as `null`, and grow the profile organically over time.
+**If not found**: capture the data from the user (see `references/profile-schema.md` for the full schema), write to the canonical location, and proceed. Don't ask for everything in one go — ask only what's needed for *this* application, mark the rest as `null`, and grow the profile organically over time. See "Document intake" below for the upload-driven shortcut.
+
+### Document intake — when the user uploads files
+
+Most users have IDs, payslips, bank statements, hotel bookings, and flight confirmations as PDFs or images already. Treat every uploaded file as an opportunity to **(a)** extract structured data, **(b)** cross-check against the profile, and **(c)** file it into the application folder.
+
+When a user pastes or attaches a file:
+
+1. **Read it** with the Read tool (PDF, JPG, PNG all supported). Extract every field that maps to the profile schema or to a per-application document.
+2. **Confirm** the extracted values to the user in one short message — "I read your passport: name SHARMA PRIYA, passport Z7621984, expires 2030-08-13. Saving to profile." — and stop if anything looks wrong.
+3. **File it** into the application folder with a clean name. Don't dump it next to a dozen other files; rename to something like `passport-bio.pdf`, `payslip-{YYYY-MM}.pdf`, `hotel-{city}.pdf`.
+4. **Cross-check** against the profile. If the payslip says salary £80k but the profile says £65k, flag it — the user may have had a raise, or one of them is wrong.
+5. **Update the profile** with anything new (NI number, employer registered office, bank IBAN, etc.).
+
+The user shouldn't have to retype data that's already on a document they have. The flow should feel like *"drop the file, get a short summary back, move on"*.
 
 ### Phase 3 — Locate or create the application folder
 

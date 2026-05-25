@@ -143,12 +143,12 @@ A growing array — every prior visa application:
     "country": "France",
     "type": "Schengen Tourist",
     "applied_via": "TLScontact London Wandsworth",
-    "application_reference": "FRA1LO20257091222",
-    "biometrics_date": "2025-04-14",
-    "trip_dates": "2025-05-01 to 2025-05-06",
-    "destination_detail": "Paris",
-    "outcome": "Granted",
-    "visa_sticker_number_if_known": "(often unknown)"
+    "application_reference": "(opaque reference from the visa centre)",
+    "biometrics_date": "YYYY-MM-DD",
+    "trip_dates": "YYYY-MM-DD to YYYY-MM-DD",
+    "destination_detail": "City or cities",
+    "outcome": "Granted / Refused / Withdrawn",
+    "visa_sticker_number_if_known": "(often unknown after passport stamping)"
   }
 ]
 ```
