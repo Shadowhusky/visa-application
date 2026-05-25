@@ -42,28 +42,34 @@ For the banner I recommend a **two-step** approach because image-gen handles typ
 ### Step 1 — Visual elements only (image-gen)
 
 ```
-Create an attractive wide banner visual, 1600×500 aspect ratio, premium
-editorial software-project identity. It should be cleaner and more polished
-than a flat SVG, but still restrained and professional.
+Create a premium, attractive banner visual for a software project that builds
+officer-ready visa application document packs.
 
-Layout: Reserve the left 65% to 70% as calm negative space for typography
-that will be overlaid later. Do not put any readable text or letters in the
-image. Place the main visual interest on the right third.
+Canvas and layout: wide 1600×500 composition. Leave the left 58% to 62% as
+calm, clean negative space for typography overlay. Put all main visual
+interest on the right 38% to 42%. No readable text anywhere in the generated
+image.
 
-Right-side visual: a tasteful desk-like arrangement in near-monochrome: a
-closed passport viewed from above, vertical orientation, with a circular visa
-stamp mark and three short abstract lines on the cover. Add one or two subtle
-paper sheets or border lines behind it, like an officer-ready application
-pack. Keep the objects sparse and geometric, not busy.
+Right-side visual concept: a refined editorial flat-lay of a visa application
+pack: a closed passport, a neat stack of A4 application documents, a checklist
+sheet with abstract check marks and short non-readable lines, a cover-letter
+sheet, a subtle circular visa stamp, a small calendar/card, and a few orderly
+paper edges. The arrangement should clearly communicate: passport +
+application form + evidence pack + checklist ready for an appointment.
 
-Style direction: Japanese-inspired editorial minimalism with material warmth,
-not SVG-flat. Warm off-white paper background, charcoal/black passport,
-subtle paper grain, soft ambient shadows, crisp edges, premium README header
-aesthetic. Thin framing hairlines may run near the top and bottom, but make
-them feel integrated and elegant.
+Style: premium modern editorial illustration with subtle material depth, warm
+paper texture, crisp object edges, soft ambient shadows, tasteful composition,
+not SVG-flat and not a broken layout placeholder. It should feel polished
+enough for a GitHub README hero.
 
-Palette: warm white, charcoal, soft gray, possibly a very muted ink-blue or
-graphite accent; no bright color.
+Palette: warm ivory paper background, deep charcoal passport, muted graphite,
+soft gray, one restrained accent such as muted burgundy or ink-blue for
+stamp/check marks. No bright colors.
+
+Hard avoid: readable words, letters, numbers, typography, watermarks, logos,
+flags, airplane, globe emblem, coat of arms, faces, hands, clutter, chaotic
+travel collage, harsh shadows, neon gradients, red X or crossed diagonal
+lines.
 ```
 
 **Aspect ratio**: 16:5 (1600×500). If your tool insists on 16:9, generate 1920×540 and crop.

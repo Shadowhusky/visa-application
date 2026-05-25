@@ -1,5 +1,9 @@
 <p align="center">
-  <img src="assets/banner.png" alt="visa-application" />
+  <img src="assets/icon.png" alt="visa-application icon" width="96" height="96" />
+</p>
+
+<p align="center">
+  <img src="assets/banner.png" alt="visa-application banner" />
 </p>
 
 A Claude Code skill that takes you from *"I need a visa"* to a printed, officer-ready document pack.
