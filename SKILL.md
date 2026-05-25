@@ -23,56 +23,82 @@ Accuracy is the principal currency here. If a fact disagrees between two sources
 
 Whenever the user mentions applying for a visa to any country, even casually ("can you help me sort out my visa for Japan?"). Don't wait for them to ask for "the visa skill" — that's not a phrase they'll use.
 
-### Activation banner (print this first, every time)
+### Activation ritual (same every time, no variation)
 
-The very first thing the skill prints on activation is a compact pixel-style banner so the user knows what they're talking to:
+The skill's first turn must look identical on every invocation. Three things happen in this exact order, in the same response:
 
-```
-  ██████
-  █▒▒  █   visa-application  v1.0  ·  MIT
-  █▒   █   any visa · any country · officer-ready in one session
-  █  ●▒█   by @Shadowhusky · github.com/Shadowhusky/visa-application
-  ██████
-```
+1. **Print the banner** (visible — five-line pixel-style header in a fenced code block):
 
-Print it inside a fenced code block so the alignment survives Markdown rendering. Keep it small — five lines total, nothing more. After the banner, in plain prose: *"Four quick questions to get started…"* and ask the Phase 1 questions.
+   ```
+     ██████
+     █▒▒  █   visa-application  v1.0  ·  MIT
+     █▒   █   any visa · any country · officer-ready in one session
+     █  ●▒█   by @Shadowhusky · github.com/Shadowhusky/visa-application
+     ██████
+   ```
 
-That's the whole activation ritual. No long preamble, no "I'd be happy to help you with your visa application today!" — the banner is the greeting.
+2. **Run Phase 0 searches** (silent — tool calls, not narrated):
+
+   ```bash
+   bash scripts/find-existing.sh profile
+   bash scripts/find-existing.sh folder "<destination from user msg, or 'visa'>"
+   ls -la ~/.claude/visa-profile.json ~/.claude/visa-history.json 2>/dev/null
+   ```
+
+3. **Call the AskUserQuestion tool** with either the cold-start 4-question set (if Phase 0 found no profile) or the warm-start single question (if Phase 0 found one).
+
+No prose between steps. No "I'd be happy to help" preamble. No "Let me check…" narration. Banner → silent searches → interactive question.
 
 ## The workflow
 
-The skill runs in six phases. Don't skip steps; the late-phase output depends on the early-phase data being clean.
+The skill runs in seven phases in **strict order**. Do not skip Phase 0. Do not list options in prose when the AskUserQuestion tool can be used. The same invocation should produce the same workflow every time — that's the whole point of having a skill.
 
-### Phase 1 — Capture user intent (1 turn)
+### Phase 0 — Searches (silent, part of the activation ritual)
 
-Ask the user, in one batched message (ideally via the structured-question tool if available):
+This is the second step of the activation ritual above. Already specified there. The result determines whether Phase 1 is the cold-start 4-question kickoff or the warm-start single question.
 
-1. **Destination country and city/cities?** (e.g., "Italy — Rome and Milan")
-2. **Country you're applying from?** (i.e., where you legally reside and will lodge the application — "UK / London")
-3. **Visa type?** (Tourist, Business, Visit family, Study, Work, Transit. Default: Tourist.)
-4. **Trip dates** (departure → return) **and how many days**.
+### Phase 1 — Ask via interactive UI (MANDATORY)
 
-Don't ask anything else yet. Personal details come from the profile (phase 2). If they're a first-time user with no profile, you'll capture identity later — capture it once, never again.
+**Always use the `AskUserQuestion` tool when asking the user anything in this skill.** Never list options in prose like "1. Tourist 2. Business …" — that's what the structured tool is for, and the user's experience must be consistent across invocations.
 
-### Phase 2 — Locate or create the user profile
+The tool caps at 4 options per question with an auto-"Other" fallback. Choose options that cover ~80% of likely answers; the long tail goes to "Other".
 
-The user's reusable identity, employment, banking, residence, and prior-visa data lives in **one** file across all applications. The canonical location is:
+#### Cold start (no profile found in Phase 0)
 
-```
-~/.claude/visa-profile.json
-```
+Send **one** `AskUserQuestion` call with these four questions batched together:
 
-**Always search first.** Before assuming there isn't one, check the canonical location AND common scattered locations the user may have used in past sessions. Use the helper:
+| # | Question | header | Options |
+|---|---|---|---|
+| 1 | Which country are you applying for a visa to? | `Destination` | `Schengen area (Italy, France, Germany, Spain, NL…)` · `United States` · `United Kingdom` · `Canada / Australia / Japan / Other` |
+| 2 | Which country are you applying *from* (where you legally reside)? | `Applying from` | `United Kingdom` · `United States` · `India` · `China` |
+| 3 | What type of visa? | `Visa type` | `Tourist / Visitor` · `Business / Conference` · `Study / Work` · `Visit family / Transit / Other` |
+| 4 | Trip duration? | `Duration` | `Under 1 week` · `1–2 weeks` · `2–4 weeks` · `Over 1 month` |
 
-```bash
-bash scripts/find-existing.sh profile
-```
+If the user picks an "Other" or umbrella option, follow up with a single free-text question to clarify (e.g., "Which Schengen country specifically?" or "Which Asian country?"). Don't try to enumerate 27 Schengen members in the tool — let them type the country name.
 
-This searches: `~/.claude/`, `~/Documents/`, `~/Desktop/`, iCloud Drive's `Documents/` and `Travel/`, and prints anything matching `*visa-profile*.json` or `*personal_profile*.json`.
+After the four kickoff answers, ask one free-text follow-up for the *specific* dates (e.g., "What's the exact departure → return date range?"). Dates have unbounded answer space and aren't a good fit for the option tool.
 
-**If found**: read it, summarise the headline identity to the user in one sentence, and ask "anything changed since {last_updated}?"
+#### Warm start (profile found in Phase 0)
 
-**If not found**: capture the data from the user (see `references/profile-schema.md` for the full schema), write to the canonical location, and proceed. Don't ask for everything in one go — ask only what's needed for *this* application, mark the rest as `null`, and grow the profile organically over time. See "Document intake" below for the upload-driven shortcut.
+Skip the 4-question kickoff entirely. The profile already has identity, residence, employment, banking, and prior-visa history. Send **one** `AskUserQuestion`:
+
+| Question | header | Options |
+|---|---|---|
+| Profile found ({last_updated}). What would you like to do? | `Next step` | `Continue existing application` (only if a relevant folder was found) · `Start new application to a different country` · `Update my profile (employer, address, etc.)` · `Something else` |
+
+Branch the rest of the workflow based on the answer. If "Continue", jump straight to Phase 6 cross-checks. If "Start new", do the 4-question kickoff to get destination/dates. If "Update", ask what specifically changed.
+
+#### When the user declines / cancels the structured question
+
+If the AskUserQuestion call returns "User declined to answer", fall back to a single short free-text message: *"No worries — just tell me in your own words: where are you going, where are you applying from, what kind of visa, and roughly when?"* — and continue from their reply.
+
+### Phase 2 — Profile setup
+
+Phase 0 already told you whether a profile exists. Now handle each case:
+
+**Profile found**: read the file, summarise the headline identity to the user in one sentence (via plain prose, not AskUserQuestion — this is a confirmation, not a question), and proceed to Phase 3. The "warm start" question in Phase 1 has already determined intent.
+
+**No profile found**: capture data using the **document intake** flow below — never type-by-type Q&A unless the user prefers it. Write to `~/.claude/visa-profile.json` after each successful extraction so progress isn't lost.
 
 ### Document intake — when the user uploads files
 
