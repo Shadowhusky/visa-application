@@ -51,7 +51,7 @@ No prose between steps. No "I'd be happy to help" preamble. No "Let me check…"
 
 ## The workflow
 
-The skill runs in eight phases in **strict order**. Do not skip Phase 0. Do not list options in prose when the AskUserQuestion tool can be used. The same invocation should produce the same workflow every time — that's the whole point of having a skill.
+The skill runs in nine phases in **strict order**. Do not skip Phase 0. Do not list options in prose when the AskUserQuestion tool can be used. The same invocation should produce the same workflow every time — that's the whole point of having a skill.
 
 ### Phase 0 — Searches (silent, part of the activation ritual)
 
@@ -86,7 +86,12 @@ Skip the 4-question kickoff entirely. The profile already has identity, residenc
 |---|---|---|
 | Profile found ({last_updated}). What would you like to do? | `Next step` | `Continue existing application` (only if a relevant folder was found) · `Start new application to a different country` · `Update my profile (employer, address, etc.)` · `Something else` |
 
-Branch the rest of the workflow based on the answer. If "Continue", jump straight to Phase 7 cross-checks. If "Start new", do the 4-question kickoff to get destination/dates. If "Update", ask what specifically changed.
+Branch the rest of the workflow based on the answer:
+
+- **Continue existing** — read the application folder's `application_status.md` to figure out what's already done and what's outstanding. Jump to the *first* incomplete phase (could be appointment booking, document upload, form filling, or just the cross-check). Don't restart from Phase 1.
+- **Start new application** — do the 4-question kickoff to get destination/dates for a fresh application.
+- **Update profile** — ask what specifically changed (new job, new address, renewed passport, etc.) and save to `~/.claude/visa-profile.json` without starting any application workflow.
+- **Something else** — free-text follow-up to understand intent.
 
 #### When the user declines / cancels the structured question
 
@@ -122,9 +127,21 @@ Each application gets its own folder. **Always search first** for an existing on
 bash scripts/find-existing.sh folder "{destination}"
 ```
 
-This searches the common iCloud Drive `Travel/` and Documents tree, and prints any folder whose name matches `*{destination}*`, `*visa*{destination}*`, or `*{destination}*visa*`. If anything plausibly matches, show the user and ask whether to use it.
+This searches the common iCloud Drive `Travel/` and Documents tree, and prints any folder whose name matches `*{destination}*`, `*visa*{destination}*`, or `*{destination}*visa*`.
 
-**If creating new**: default to `~/Documents/Visa Applications/{destination}-{year}/` and ask the user to confirm. Don't create silently — they might prefer iCloud, Dropbox, or somewhere specific.
+**If a candidate folder is found:** ask via `AskUserQuestion` (not prose):
+
+| Question | header | Options |
+|---|---|---|
+| I found a folder that looks related to your {destination} application — use it? | `Folder` | `Use this folder` · `Create a new one` · `Show me where it is first` |
+
+**If no candidate is found OR the user chose "Create a new one":** ask via `AskUserQuestion`:
+
+| Question | header | Options |
+|---|---|---|
+| Where would you like the new application folder? | `Location` | `~/Documents/Visa Applications/` (default) · `iCloud Drive` · `Desktop` · `Custom path` |
+
+Then create the folder with destination + year in the name. Don't create silently.
 
 Inside the application folder, you'll later create:
 
@@ -213,6 +230,15 @@ After Phase 5 settles an appointment date, automatically check:
 
 ### Phase 6 — Generate documents + assemble Print Pack
 
+**Pre-flight: document freshness check.** Before generating anything, verify the supporting documents in the folder aren't stale relative to the submission (appointment) date:
+
+- **Payslips:** the most recent must be < 30 days old at appointment date. If not, ask the user to upload the latest payslip via `AskUserQuestion` ("Latest payslip date?" / `Past 30 days` · `30–60 days old` · `Older` · `Don't have one`). Don't generate the document pack with stale evidence.
+- **Bank statement:** must end within 30 days of appointment date. Same check.
+- **Hotel / flight bookings:** must be active reservations (not cancelled). Spot check by reading the latest copy in the folder.
+- **Insurance:** dates must cover the trip ±1 day buffer.
+
+If any check fails, surface to user *before* generating documents — there's no point producing a Print Pack against stale evidence.
+
 For each document type, prefer the proven approach — render HTML via Chrome headless to PDF.
 
 ```bash
@@ -225,7 +251,7 @@ Documents to produce, in order:
 
 1. **Cover letter** — addressed to "Visa Section, Consulate General of {destination}, {origin city}". One page. State purpose, dates, employment, self-funding, and reference to enclosed evidence. Avoid promising things the documents don't back. See `templates/cover-letter.html`.
 2. **Employment letter** — if employed. Should be signed by manager or HR on company letterhead. Render a draft, give to user, they get it signed. See `templates/employment-letter.html`.
-3. **Filled visa application form** — the skill fills this itself. Asking the user to fill it by hand is a last resort, not the default. Follow the four-tier strategy in `references/form-filling-strategy.md`:
+3. **Filled visa application form** (note: this is the *full visa application form*, distinct from the short booking form filled in Phase 5 — they may live on the same portal or different ones). The skill fills this itself. Asking the user to fill it by hand is a last resort, not the default. Follow the four-tier strategy in `references/form-filling-strategy.md`:
 
    - **Tier 1 — Online portal.** If the destination has an official portal (Italy `e-applicationvisa.esteri.it`, France `france-visas.gouv.fr`, US DS-160 `ceac.state.gov`, etc.), load the Chrome browser MCP via ToolSearch and fill the portal page-by-page using profile data. The portal generates a PDF with a 2D barcode the officer scans. This is the cleanest output.
    - **Tier 2 — Interactive PDF.** If no portal but the PDF has AcroForm fields (`pymupdf` detects this via `doc.is_form_pdf`), fill the named fields directly. Perfect alignment guaranteed.
@@ -251,10 +277,74 @@ Tell the user what's done, what's still pending, and what specifically to bring 
 ✅ Compliant out of the box: <list of items already met>
 ❌ Still needed before {appointment date}: <action items>
 ⚠️ Items the user must verify themselves: <e.g., recent immigration status, fund balance>
-📦 At the appointment: <€XX visa fee, biometric photos, original passport>
+📦 At the appointment: <{currency}{amount} visa fee, biometric photos, original passport>
 ```
 
 Surface any inconsistency you find — better to flag a date mismatch now than have the officer find it.
+
+Write the same content to `{application-folder}/application_status.md` so the next invocation (Phase 0 + warm-start "Continue") can read where things stand without re-prompting the user.
+
+### Phase 8 — Post-submission: tracking, collection, outcome
+
+The workflow doesn't end when the user walks out of the visa centre. Applications take days to weeks to decide, and the skill needs to be able to pick up the thread on a later invocation.
+
+**Trigger:** if Phase 0 finds a profile AND an application folder whose `application_status.md` shows status `submitted` or `awaiting_decision`, the warm-start question shifts to:
+
+| Question | header | Options |
+|---|---|---|
+| Your {destination} application is in processing — what's happened? | `Outcome` | `Still waiting / want to check status` · `Approved — passport collected` · `Refused — need to understand next steps` · `Other (resubmission request, courier issue, etc.)` |
+
+#### Branch A — Still waiting
+
+Help the user check status:
+
+1. Read the tracking URL from `application_status.md` (stored at the end of Phase 5).
+2. Open the centre's tracking dashboard via browser MCP. Most centres need just the application reference + passport number.
+3. Report status to user. If status is "decision made — ready for collection", switch to Branch B.
+4. If status has been "submitted" for longer than the documented processing time + 5 days, flag it as unusually slow and surface the centre's escalation contact.
+
+#### Branch B — Approved
+
+Capture from the user (or from the granted visa sticker PDF if courier-delivered with a scan):
+
+- Visa sticker / reference number
+- Valid from / Valid until
+- Number of entries (single / two / multiple)
+- Days of stay allowed
+- Type code (e.g., Schengen C, US B1/B2)
+
+Update:
+
+- `~/.claude/visa-profile.json` → append to `visa_history[]` with the full granted entry. The next application can answer "previous visas in last 3 years" precisely.
+- `application_status.md` → status `granted` with full visa details.
+
+Briefly remind the user of:
+
+- Trip-day documents to carry (passport with visa, return ticket, insurance, hotel print-outs).
+- EES biometric capture at the first Schengen border crossing if relevant.
+- Any country-specific "things you cannot do" on this visa (no professional sportsperson, no public funds, etc.) — important if the visa allows residence as well as travel.
+
+#### Branch C — Refused
+
+Capture the refusal reason from the user (or read the official refusal letter PDF if they upload it). The Schengen refusal letter is highly standardised — each reason has a code (1–9) — extract the code(s).
+
+Assess and advise (don't promise outcomes):
+
+- **Documentary refusal** (missing document, support not credible) → file an appeal within the consulate's deadline (usually 30 days for Schengen). Draft the appeal letter if requested.
+- **Fundamental refusal** (insufficient ties to home country, intent doubts) → re-applying is sometimes possible but usually needs a substantively stronger file, not just a re-submission.
+- Some Schengen refusals say "no appeal possible" but re-application is allowed; others permit appeal but not re-application. Country-specific.
+
+Update `visa_history[]` with `outcome: "Refused"` and the reason code. Most future applications require disclosure of prior refusals — this entry will be picked up automatically.
+
+If the user wants to appeal, generate an appeal letter PDF (use a variant of the cover-letter template) addressing each refusal reason point by point. The user signs and submits within the deadline.
+
+#### Branch D — Other
+
+Free text follow-up. Common cases:
+
+- Passport collection logistics — in-person at the centre vs. courier delivery (paid extra fee).
+- Mid-processing documentation request from the consulate — research what they're asking, help respond.
+- Withdrawal of application — capture and update history.
 
 ## The "do, don't ask" principle
 
@@ -293,17 +383,18 @@ Also update `~/.claude/visa-history.json` with a summary of what was applied for
 
 ## File map for this skill
 
-- `SKILL.md` — this file, the workflow
-- `references/research-protocol.md` — how to research and cross-validate
-- `references/document-checklist.md` — standard document lists by visa type
-- `references/known-portals.md` — known online application portals + country quirks
-- `references/profile-schema.md` — the visa-profile.json schema
-- `references/form-filling-strategy.md` — the 4-tier strategy for filling application forms without bothering the user
-- `references/visa-scenarios.md` — less-common scenarios (renewal, family, business, transit, long-stay, student, working holiday, multi-country itineraries, etc.)
-- `references/known-portals.md` also contains the appointment-booking flow per destination (URL, steps, fees, common quirks)
-- `templates/cover-letter.html` — letter template, A4 single page
-- `templates/employment-letter.html` — letter template, A4 single page
-- `templates/checklist.html` — Print Pack cover-sheet checklist
-- `scripts/render-pdf.sh` — HTML → PDF using Chrome headless
-- `scripts/find-existing.sh` — search the user's machine for existing profile / folder
-- `scripts/build-print-pack.sh` — assemble the numbered Print Pack
+| File | Purpose |
+|---|---|
+| `SKILL.md` | This file — the workflow |
+| `references/research-protocol.md` | How to research and cross-validate sources |
+| `references/document-checklist.md` | Standard document lists by visa type |
+| `references/known-portals.md` | Online application portals, appointment-booking URLs/flows, country quirks |
+| `references/profile-schema.md` | The `visa-profile.json` schema |
+| `references/form-filling-strategy.md` | 4-tier strategy for filling application forms without bothering the user |
+| `references/visa-scenarios.md` | Less-common scenarios (renewal, family, business, transit, student, refusal/appeal, multi-country) |
+| `templates/cover-letter.html` | Cover letter template, A4 single page |
+| `templates/employment-letter.html` | Employment letter template, A4 single page |
+| `templates/checklist.html` | Print Pack cover-sheet checklist |
+| `scripts/render-pdf.sh` | HTML → PDF via Chrome headless |
+| `scripts/find-existing.sh` | Search the user's machine for existing profile / folder |
+| `scripts/build-print-pack.sh` | Assemble the numbered Print Pack |
