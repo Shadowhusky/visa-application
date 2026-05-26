@@ -29,19 +29,15 @@ You get a complete application folder: browser-viewable drafts, print-ready PDFs
 <details>
 <summary><b>Application Status Tracker</b> — know exactly where you left off</summary>
 <br>
-<p align="center"><img src="assets/demo-status.png" alt="Application status page showing trip details, appointment info, costs, and progress checklist" width="800" /></p>
+<p align="center"><img src="assets/demo/demo-status-en.png" alt="Application status page showing trip details, appointment info, and progress checklist" width="800" /></p>
 
 Tracks every stage of your application: research, appointment booking, document assembly, submission, and outcome. Come back days or weeks later and the skill resumes from this file instead of making you explain everything again. Status badges update automatically — from **IN PROGRESS** through **SUBMITTED** to **GRANTED** or **REFUSED**.
-
-<p align="center"><img src="assets/demo-status-granted.png" alt="Application status page showing granted visa with outcome details" width="800" /></p>
-
-After approval, the visa details (sticker number, validity dates, entries) are captured and saved to your reusable profile, so the next Schengen application can auto-fill the "previous visas in the last 3 years" question.
 </details>
 
 <details>
 <summary><b>Appointment-Day Checklist</b> — what to check before you leave home</summary>
 <br>
-<p align="center"><img src="assets/demo-checklist.png" alt="Checklist showing before-leaving-home items, stack order, officer questions, and cross-checks" width="800" /></p>
+<p align="center"><img src="assets/demo/demo-checklist-en.png" alt="Checklist showing before-leaving-home items, stack order, officer questions, and cross-checks" width="800" /></p>
 
 Prints as file `00`, the cover sheet of your Print Pack. It tells you:
 
@@ -153,17 +149,7 @@ Skill:  Captured: NLD 7829104, valid 20 Jul → 20 Jan 2027, multiple
 - **Timing intelligence** — warns about stale documents, processing time vs trip date, peak-season backlogs, passport expiry traps, insurance date gaps.
 - **Questionnaire forms** — when the skill needs 4+ answers (DS-160 fields, family details, travel history), it generates an interactive HTML form you fill in your browser — not a chat wall of questions.
 - **Dual output** — every generated document is both HTML (browser-viewable) and PDF (print-ready). User-provided uploads stay in their original format.
-
-### Adapts to your language
-
-User-facing documents (checklist, status tracker) are generated in whatever language you use. Application-facing documents (cover letter, visa form) stay in the language the consulate expects.
-
-| Status tracker | Appointment checklist |
-|---|---|
-| ![English](assets/demo/demo-status-en.png) | ![English](assets/demo/demo-checklist-en.png) |
-| ![中文](assets/demo/demo-status-zh.png) | ![中文](assets/demo/demo-checklist-zh.png) |
-| ![Español](assets/demo/demo-status-es.png) | ![Español](assets/demo/demo-checklist-es.png) |
-| ![हिन्दी](assets/demo/demo-status-hi.png) | ![हिन्दी](assets/demo/demo-checklist-hi.png) |
+- **Language adaptation** — user-facing documents (checklist, status tracker, questionnaire) are generated in your language. Application-facing documents (cover letter, visa form) use the language the consulate expects.
 
 ### Install
 
@@ -267,17 +253,15 @@ MIT.
 <details>
 <summary><b>申请状态跟踪页</b> —— 下次回来不用重新说一遍</summary>
 <br>
-<p align="center"><img src="assets/demo-status.png" alt="申请状态页" width="800" /></p>
+<p align="center"><img src="assets/demo/demo-status-zh.png" alt="申请状态页" width="800" /></p>
 
-它会记录申请进度、预约信息、费用、材料状态和下一步。几天或几周后再回来，技能会直接从这个文件继续，不需要你重新解释。状态会从 <b>IN PROGRESS</b> 自动推进到 <b>SUBMITTED</b>，最后更新为 <b>GRANTED</b> 或 <b>REFUSED</b>。
-
-<p align="center"><img src="assets/demo-status-granted.png" alt="已批准的状态页" width="800" /></p>
+它会记录申请进度、预约信息、费用、材料状态和下一步。几天或几周后再回来，技能会直接从这个文件继续，不需要你重新解释。状态会从 <b>进行中</b> 自动推进到 <b>已递交</b>，最后更新为 <b>已通过</b> 或 <b>被拒</b>。
 </details>
 
 <details>
 <summary><b>预约当天清单</b> —— 出门前照着看就行</summary>
 <br>
-<p align="center"><img src="assets/demo-checklist.png" alt="清单页" width="800" /></p>
+<p align="center"><img src="assets/demo/demo-checklist-zh.png" alt="清单页" width="800" /></p>
 
 这一页会放在材料包最前面。出门前要签哪里、带什么卡、材料怎么排、受理人员可能问什么、哪些地方还需要你本人确认，都写清楚。
 </details>
@@ -355,14 +339,13 @@ Terminas con una carpeta completa para la solicitud: borradores en HTML para rev
 <details>
 <summary><b>Seguimiento del estado de la solicitud</b></summary>
 <br>
-<p align="center"><img src="assets/demo-status.png" alt="Página de estado" width="800" /></p>
-<p align="center"><img src="assets/demo-status-granted.png" alt="Estado aprobado" width="800" /></p>
+<p align="center"><img src="assets/demo/demo-status-es.png" alt="Página de estado" width="800" /></p>
 </details>
 
 <details>
 <summary><b>Checklist para el día de la cita</b></summary>
 <br>
-<p align="center"><img src="assets/demo-checklist.png" alt="Checklist" width="800" /></p>
+<p align="center"><img src="assets/demo/demo-checklist-es.png" alt="Checklist" width="800" /></p>
 </details>
 
 <details>
@@ -425,14 +408,13 @@ MIT.
 <details>
 <summary><b>आवेदन की स्थिति ट्रैक करने वाला पेज</b></summary>
 <br>
-<p align="center"><img src="assets/demo-status.png" alt="स्थिति पेज" width="800" /></p>
-<p align="center"><img src="assets/demo-status-granted.png" alt="स्वीकृत स्थिति" width="800" /></p>
+<p align="center"><img src="assets/demo/demo-status-hi.png" alt="स्थिति पेज" width="800" /></p>
 </details>
 
 <details>
 <summary><b>अपॉइंटमेंट वाले दिन की चेकलिस्ट</b></summary>
 <br>
-<p align="center"><img src="assets/demo-checklist.png" alt="चेकलिस्ट" width="800" /></p>
+<p align="center"><img src="assets/demo/demo-checklist-hi.png" alt="चेकलिस्ट" width="800" /></p>
 </details>
 
 <details>
