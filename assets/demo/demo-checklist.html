@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Visa Appointment — Checklist</title>
+<style>
+@page { size: A4; margin: 14mm 16mm 14mm 16mm; }
+html, body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 10pt; line-height: 1.4; color: #111;
+  margin: 0; padding: 0;
+}
+h1 { font-size: 18pt; margin: 0 0 2pt 0; letter-spacing: 0.3pt; }
+.meta { font-size: 10.5pt; color: #333; margin-bottom: 10pt; }
+.meta strong { color: #000; }
+hr { border: 0; border-top: 1px solid #aaa; margin: 8pt 0; }
+h2 {
+  font-size: 11.5pt;
+  margin: 10pt 0 4pt 0;
+  padding-bottom: 2pt;
+  border-bottom: 1px solid #333;
+  text-transform: uppercase;
+  letter-spacing: 0.8pt;
+}
+.checklist { list-style: none; padding: 0; margin: 0 0 8pt 0; }
+.checklist li {
+  position: relative;
+  padding-left: 18pt;
+  margin-bottom: 3.5pt;
+}
+.checklist li::before {
+  content: "\2610";
+  position: absolute; left: 0; top: -1pt;
+  font-size: 13pt;
+}
+.checklist li.warn::before { content: "\26A0"; color: #c25c00; }
+table { border-collapse: collapse; width: 100%; margin: 4pt 0 8pt 0; font-size: 9.5pt; }
+th, td { text-align: left; padding: 3pt 6pt; border-bottom: 1px solid #ddd; vertical-align: top; }
+th { background: #f4f4f4; font-weight: 600; }
+td.num { width: 28pt; font-weight: 600; color: #555; }
+td.note { color: #555; font-size: 9pt; }
+.qa { margin: 0 0 8pt 0; }
+.qa .q { font-weight: 600; }
+.qa .a { color: #444; margin-left: 8pt; }
+.row { display: flex; gap: 14pt; }
+.col { flex: 1; }
+.banner {
+  background: #fff5ea;
+  border-left: 3pt solid #c25c00;
+  padding: 6pt 10pt;
+  margin: 6pt 0 8pt 0;
+  font-size: 10pt;
+}
+.banner b { color: #7a3a00; }
+.footer {
+  margin-top: 12pt;
+  font-size: 8.5pt; color: #777;
+  text-align: center;
+  border-top: 1px solid #ddd; padding-top: 6pt;
+}
+</style>
+</head>
+<body>
+
+<h1>Visa Appointment &mdash; Checklist</h1>
+<div class="meta">
+  <strong>Thu 12 Jun 2026, 10:30</strong> &middot; VFS Global Netherlands, 66 Wilson Street, London EC2A 2BT &middot; <strong>Arrive by 10:15</strong>
+</div>
+<hr>
+
+<div class="banner"><b>Residence permit expiry:</b> Verify your UK visa is valid until at least <b>27 August 2026</b> (1 month past trip end). Print a fresh eVisa status + share code no more than 1 week before the appointment.</div>
+
+<h2>Before leaving home</h2>
+<ul class="checklist">
+  <li>All 15 docs printed single-sided on A4, stacked in numbered order</li>
+  <li class="warn"><b>Application form</b> &mdash; printed from netherlandsworldwide.nl with unique code, <b>signed</b></li>
+  <li class="warn"><b>Cover letter</b> &mdash; <b>signed at bottom</b></li>
+  <li>Physical passport in bag (not inside folder)</li>
+  <li>2 biometric photos (35&times;45mm, white background, &lt;6 months old)</li>
+  <li>Card for visa fee: EUR 90 / GBP 77.50 (Visa or Mastercard only &mdash; no Amex)</li>
+  <li>Phone (digital backups of insurance, hotel, flights)</li>
+</ul>
+
+<h2>Stack order &mdash; Print Pack</h2>
+<table>
+<tr><th>#</th><th>Document</th><th>Notes</th></tr>
+<tr><td class="num">01</td><td>VFS Appointment Confirmation</td><td class="note">Print from email/account</td></tr>
+<tr><td class="num">02</td><td>Visa Application Form</td><td class="note">From netherlandsworldwide.nl &mdash; SIGN</td></tr>
+<tr><td class="num">03</td><td>Cover Letter</td><td class="note">SIGN at bottom</td></tr>
+<tr><td class="num">04</td><td>Passport &mdash; bio page photocopy</td><td class="note">Colour copy + 2 photos paperclipped</td></tr>
+<tr><td class="num">05</td><td>UK eVisa Status (Residence Proof)</td><td class="note">Fresh printout from gov.uk</td></tr>
+<tr><td class="num">06</td><td>UK Share Code printout</td><td class="note">Verifiable via gov.uk/check-immigration-status</td></tr>
+<tr><td class="num">07</td><td>Travel Insurance Certificate</td><td class="note">Must show &ge;EUR 30k, all Schengen, full trip dates</td></tr>
+<tr><td class="num">08</td><td>Flight &mdash; outbound</td><td class="note">London &rarr; Amsterdam</td></tr>
+<tr><td class="num">09</td><td>Flight &mdash; return</td><td class="note">Amsterdam &rarr; London</td></tr>
+<tr><td class="num">10</td><td>Hotel reservation</td><td class="note">Covering all nights (24&ndash;27 Jul)</td></tr>
+<tr><td class="num">11</td><td>Employment Letter</td><td class="note">Fresh, dated &lt;1 month. Signed by HR on letterhead</td></tr>
+<tr><td class="num">12</td><td>Payslip &mdash; most recent month</td><td class="note">Must be &lt;30 days old at appointment</td></tr>
+<tr><td class="num">13</td><td>Payslip &mdash; month &minus;1</td><td class="note"></td></tr>
+<tr><td class="num">14</td><td>Payslip &mdash; month &minus;2</td><td class="note"></td></tr>
+<tr><td class="num">15</td><td>Bank Statement (3 months)</td><td class="note">Ending &lt;30 days before appointment</td></tr>
+</table>
+
+<div class="row">
+<div class="col">
+
+<h2>Likely officer questions</h2>
+<div class="qa"><span class="q">Why the Netherlands?</span><br><span class="a">Short leisure trip &mdash; sightseeing, museums, cycling. 3 nights.</span></div>
+<div class="qa"><span class="q">Where will you stay?</span><br><span class="a">Hotel Nadia, Keizersgracht 196, Amsterdam.</span></div>
+<div class="qa"><span class="q">Who is funding the trip?</span><br><span class="a">Self-funded. Full-time employed, &pound;60k salary. Bank statements show healthy balance.</span></div>
+<div class="qa"><span class="q">Previous Schengen visas?</span><br><span class="a">France May 2025 (tourist, returned on time). Italy June 2026 (tourist, returned on time).</span></div>
+<div class="qa"><span class="q">What ties you to the UK?</span><br><span class="a">Full-time employment, London residence, established visa history.</span></div>
+
+</div>
+<div class="col">
+
+<h2>Cross-checks &mdash; verified</h2>
+<ul class="checklist">
+  <li>Passport valid &ge;3 months past trip end (expires 2030)</li>
+  <li>Passport issued within last 10 years</li>
+  <li>Trip dates within insurance coverage window</li>
+  <li>Insurance &ge;EUR 30,000 all Schengen</li>
+  <li>Funds &ge;EUR 220 (EUR 55/day &times; 4 days)</li>
+  <li>Biometrics in VIS from prior Schengen &mdash; 59-month reuse</li>
+  <li>96.7% approval rate for this nationality (2024 data)</li>
+</ul>
+
+<h2 style="color: #c25c00;">Verify yourself</h2>
+<ul class="checklist">
+  <li class="warn">UK visa expiry &ge; 27 Aug 2026</li>
+  <li class="warn">Hotel booking shows correct guest count</li>
+  <li class="warn">Flight dates match hotel dates exactly</li>
+</ul>
+
+</div>
+</div>
+
+<div class="footer">Alex Chen &middot; Passport EA1234567 &middot; Ref NLD-2026-08821437</div>
+
+</body>
+</html>

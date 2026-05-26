@@ -3,10 +3,10 @@
 </p>
 
 <p align="center">
-  <a href="#english">🇬🇧 English</a> ·
-  <a href="#中文">🇨🇳 中文</a> ·
-  <a href="#español">🇪🇸 Español</a> ·
-  <a href="#हिन्दी">🇮🇳 हिन्दी</a>
+  <a href="#english">English</a> ·
+  <a href="#中文">中文</a> ·
+  <a href="#español">Español</a> ·
+  <a href="#हिन्दी">हिन्दी</a>
 </p>
 
 ---
@@ -14,7 +14,7 @@
 <a id="english"></a>
 ## English
 
-A Claude Code skill that takes you from *"I need a visa"* to a printed, officer-ready document pack.
+A Claude Code skill that takes you from *"I need a visa"* to a printed, officer-ready document pack — in one session.
 
 ### Why
 
@@ -22,55 +22,136 @@ Visa rules drift every quarter. Half the third-party guides recycle 2019 informa
 
 This skill keeps the rules current and the paperwork tidy. You handle what only you can — flights, photos, signing things. It handles the rest.
 
+### What it produces
+
+Every application gets its own folder with browser-viewable HTML documents, matching PDFs for print, and a numbered Print Pack in the order an officer flips through them.
+
+<details>
+<summary><b>Application Status Tracker</b> — the single source of truth across sessions</summary>
+<br>
+<p align="center"><img src="assets/demo-status.png" alt="Application status page showing trip details, appointment info, costs, and progress checklist" width="800" /></p>
+
+Tracks every phase of your application: research, appointment booking, document assembly, submission, and outcome. When you come back days or weeks later, the skill reads this file and picks up exactly where you left off. Status badges update automatically — from **IN PROGRESS** through **SUBMITTED** to **GRANTED** or **REFUSED**.
+
+<p align="center"><img src="assets/demo-status-granted.png" alt="Application status page showing granted visa with outcome details" width="800" /></p>
+
+Once granted, the visa details (sticker number, validity, entries) are captured and saved to your reusable profile — so the next Schengen application auto-fills the "previous visas in last 3 years" question.
+</details>
+
+<details>
+<summary><b>Appointment-Day Checklist</b> — your one-page cheat sheet</summary>
+<br>
+<p align="center"><img src="assets/demo-checklist.png" alt="Checklist showing before-leaving-home items, stack order, officer questions, and cross-checks" width="800" /></p>
+
+Prints as the **cover sheet** of your Print Pack (file `00`). Includes:
+
+- **Before leaving home** — what to sign, what to bring, what card to carry
+- **Stack order** — every document numbered in the order the officer expects them
+- **Likely officer questions** — with suggested answers drawn from your actual documents
+- **Cross-checks verified** — passport validity, insurance coverage, fund minimums
+- **Verify yourself** — things the skill can't confirm (UK visa expiry, guest counts)
+- **Warning banners** — critical flags like residence permit expiry timing
+</details>
+
+<details>
+<summary><b>Cover Letter</b> — one page, formal, ready to sign</summary>
+<br>
+<p align="center"><img src="assets/demo-cover-letter.png" alt="Cover letter addressed to consulate with applicant details and trip purpose" width="700" /></p>
+
+Addressed to the correct consulate, with your real employment details, trip dates, prior visa history, and a reference to the enclosed evidence. Generated from your profile — you review it, sign it, done.
+</details>
+
+<details>
+<summary><b>Print Pack</b> — numbered, ordered, print-and-go</summary>
+
+```
+Print Pack/
+├── 00 - CHECKLIST.pdf
+├── 01 - VFS Appointment Confirmation.pdf
+├── 02 - Visa Application Form - SIGN.pdf
+├── 03 - Cover Letter - SIGN.pdf
+├── 04 - Passport - Bio Page (photocopy).pdf
+├── 05 - UK Immigration Status (eVisa).pdf
+├── 06 - UK Share Code.pdf
+├── 07 - Travel Insurance Certificate.pdf
+├── 08 - Flight - Outbound.pdf
+├── 09 - Flight - Return.pdf
+├── 10 - Hotel Reservation.pdf
+├── 11 - Employment Letter (signed).pdf
+├── 12 - Payslip - Month 1.pdf
+├── 13 - Payslip - Month 2.pdf
+├── 14 - Payslip - Month 3.pdf
+└── 15 - Bank Statement (3 months).pdf
+```
+
+Print all files, single-sided, A4, keep in numbered order. The officer flips through them in sequence.
+</details>
+
+### How it works
+
+The skill runs a **9-phase workflow** — strict order, no skipping, same every time:
+
+| Phase | What happens |
+|-------|-------------|
+| **0. Search** | Finds your existing profile and any prior application folders on disk |
+| **1. Ask** | Interactive questions via structured UI — cold start (4 questions) or warm start (resume / new / update) |
+| **2. Profile** | Reads your passport, payslips, bank statements via document intake — you drop files, it extracts data |
+| **3. Folder** | Locates or creates the application folder (iCloud Drive, Documents, Desktop, or custom) |
+| **4. Research** | Hits the consulate page, visa-centre operator, and a third-party guide. Cross-validates every material claim. Flags disagreements. |
+| **5. Appointment** | Books or captures the VFS/TLScontact appointment. Runs timing cross-checks against processing time and document freshness. |
+| **6. Documents** | Generates cover letter, employment letter draft, fills the application form (portal → interactive PDF → vision overlay → manual fallback), assembles the Print Pack |
+| **7. Cross-check** | Final report: document manifest, compliance checks, next steps. Written to `application_status.html` for multi-session continuity. |
+| **8. Post-submission** | Tracks status, captures granted visa details into reusable profile, handles refusals and appeals |
+
 ### Demo
 
 ```
-You:    I need a Schengen visa to Italy from the UK. Trip 22-26 June.
+You:    I need a Schengen visa to the Netherlands from the UK, late July.
 
-Skill:  Four quick questions… [you answer]
-        No profile yet — drop in your passport, payslip, and a bank
-        statement.
+Skill:  [structured questions for dates and details]
 
-You:    [drops 3 files]
+You:    24th to 27th.
 
-Skill:  Read them. Profile saved.
-        Researching against the Italian consulate page, VFS Italy
-        London, and the MFA portal… cross-validated: €90 fee, €30k
-        insurance, 35×45mm photo, EES live at the border since
-        Oct 2025.
+Skill:  Got it — Netherlands Schengen tourist, 4 days, applying from London.
+        Profile on file from your last application.
+        Researching against netherlandsworldwide.nl, VFS Global UK,
+        and Wise 2026 guide…
 
-        Have you already booked your visa appointment?  [you answer]
-        OK — booking with VFS Italy London via Chrome MCP.
-        Pausing at the payment step — you enter the card.
+        Cross-validated: EUR 90 fee + GBP 18 VFS, EUR 30k insurance,
+        35×45mm photo, online form mandatory from 1 Jun 2026, 15–21 day
+        processing, 59-month biometric reuse from your France 2025 capture.
 
-You:    [pays, confirms slot]
+        [books appointment via VFS Global]
 
-Skill:  Appointment captured: Wed 4 June, 10:00, Pocock St.
-        Generating cover letter, employment letter draft, application
-        form via e-applicationvisa.esteri.it (with 2D barcode), and
-        a one-page checklist.
+        Generating cover letter, checklist, application status tracker…
+        Assembling Print Pack (15 documents).
 
-        One issue caught: hotel checkout dated a day after return flight.
+        ⚠ Flag: your UK Graduate Visa must be valid until at least
+        27 Aug 2026 (1 month past trip end) — verify via UKVI account.
 
-You:    [signs, prints, walks in]
+You:    [prints, signs, walks in]
 
-       (… weeks later, after the trip …)
+        (… 2 weeks later …)
 
-You:    Update on the Italy visa — got approved, here's the sticker.
+You:    Visa granted — here's the sticker.
 
-Skill:  Captured: visa 1234567, valid 22 May → 22 Nov, multiple
-        entries, 90 days. Saved to your visa_history — the next
-        Schengen application will reuse it for the "previous visas"
-        question.
+Skill:  Captured: NLD 7829104, valid 20 Jul → 20 Jan 2027, multiple
+        entries, 90 days. Saved to visa_history — the next Schengen
+        application auto-fills "previous visas in last 3 years".
 ```
 
 **First visa: ~45 minutes. Every visa after: ~10 minutes.**
 
-### What you get
+### Key features
 
-- A reusable profile at `~/.claude/visa-profile.json` — passport, address, employer, banking. Built once, replayed forever.
-- A document pack — cover letter, employment letter draft, filled application form, checklist PDF. The skill fills the form itself: portal, interactive PDF, vision overlay — manual transcription only as a last resort.
-- A numbered Print Pack folder in officer flip-order. Print A4, sign, walk in.
+- **Reusable profile** at `~/.claude/visa-profile.json` — passport, address, employer, banking, visa history. Built once from document intake (drop your passport scan, payslips, bank statement — the skill reads them). Replayed forever.
+- **Cross-validated research** — consulate page first, visa-centre operator second, third-party guide third. Two sources minimum for every material claim. Source URLs and dates cited.
+- **Smart form filling** — 4-tier strategy: online portal (with 2D barcode), interactive PDF fields, vision-driven coordinate overlay, manual data sheet as last resort. The skill fills the form itself; asking you to do it by hand is the fallback, not the default.
+- **Multi-session continuity** — `application_status.html` tracks progress. Come back days later and the skill resumes at the first incomplete phase.
+- **Document intake** — drop a file, get structured data back. Passport scan → name, number, expiry. Payslip → salary, employer, NI number. Hotel PDF → dates, address, guest count. Cross-checked against the profile automatically.
+- **Timing intelligence** — warns about stale documents, processing time vs trip date, peak-season backlogs, passport expiry traps, insurance date gaps.
+- **Questionnaire forms** — when the skill needs 4+ answers (DS-160 fields, family details, travel history), it generates an interactive HTML form you fill in your browser — not a chat wall of questions.
+- **Dual output** — every generated document is both HTML (browser-viewable) and PDF (print-ready). User-provided uploads stay in their original format.
 
 ### Install
 
@@ -94,15 +175,50 @@ Then in any Claude Code session, mention a visa. The skill takes over.
 
 ### Coverage
 
-Schengen (all 27), US B1/B2, UK Visitor, Japan, Canada, China, Australia — any country with a documented visa process.
+Schengen (all 27), US B1/B2, UK Visitor, Japan, Canada, China, Australia — any country with a documented visa process. Country-specific quirks are handled: VFS vs TLScontact routing, online portal detection, biometric reuse rules, EES border procedures.
 
-### Not for
+### What it won't do
 
-Asylum, family reunification, or anything that wants a real visa lawyer. Payments are always on you — the skill never enters card details.
+- Asylum, family reunification, or anything that needs a real immigration lawyer
+- Enter payment card details — the skill always stops at the payment step
+- Make promises about visa outcomes — it assembles the strongest possible file, not guarantees
+- Store your data remotely — everything is local files on your machine
 
 ### Privacy
 
-Profile is local only, never transmitted. Application folders default to `~/Documents/Visa Applications/{Country}-{Year}/`.
+Profile data is **local only**, never transmitted. Application folders default to `~/Documents/Visa Applications/{Country}-{Year}/` or iCloud Drive. The skill reads your documents to extract data but never sends them anywhere.
+
+### File structure
+
+```
+visa-application/
+├── SKILL.md                    ← the 9-phase workflow (what Claude reads)
+├── README.md                   ← this file
+├── INSTALL.md                  ← installation & troubleshooting
+├── LICENSE                     ← MIT
+├── references/
+│   ├── research-protocol.md    ← how to research and cross-validate sources
+│   ├── document-checklist.md   ← standard document lists by visa type
+│   ├── known-portals.md        ← online application portals, booking URLs, country quirks
+│   ├── profile-schema.md       ← visa-profile.json schema
+│   ├── form-filling-strategy.md ← 4-tier strategy for filling application forms
+│   └── visa-scenarios.md       ← renewal, family, business, transit, student, refusal/appeal
+├── templates/
+│   ├── cover-letter.html       ← cover letter, A4 single page
+│   ├── employment-letter.html  ← employment letter, A4 single page
+│   ├── checklist.html          ← Print Pack cover-sheet checklist
+│   ├── application-status.html ← application status tracker
+│   ├── form-data.html          ← Tier 4 manual-transcription data sheet
+│   └── questionnaire.html      ← interactive HTML form for bulk data collection
+├── scripts/
+│   ├── render-pdf.sh           ← HTML → PDF via Chrome headless
+│   ├── find-existing.sh        ← search for existing profile / application folders
+│   └── build-print-pack.sh     ← assemble the numbered Print Pack
+├── assets/                     ← banner, icons, demo screenshots
+└── tests/
+    ├── smoke-test.sh           ← structural sanity check
+    └── scenarios.md            ← 11 end-to-end behavioural scenarios
+```
 
 ### License
 
@@ -121,83 +237,65 @@ MIT.
 
 这个技能让规则保持最新，让材料井井有条。你只管做只有你能做的事 —— 订机票、拍照片、签字。其余的它来搞定。
 
-### 演示
+### 产出物
 
-```
-你：    我人在英国，想办意大利申根签证。行程 6 月 22 到 26 日。
+每次申请都有自己的文件夹，包含浏览器可查看的 HTML 文档、配套的打印用 PDF，以及按官员翻阅顺序编号的 Print Pack。
 
-技能：  先问四个问题…… [你回答]
-        还没建过档 —— 把护照、工资单、银行流水拖进来。
+<details>
+<summary><b>申请状态跟踪页</b> —— 跨会话的唯一真相源</summary>
+<br>
+<p align="center"><img src="assets/demo-status.png" alt="申请状态页" width="800" /></p>
 
-你：    [拖入 3 份文件]
+跟踪申请的每个阶段。几天或几周后回来，技能读取此文件并从中断处继续。状态从 <b>IN PROGRESS</b> 自动更新到 <b>GRANTED</b> 或 <b>REFUSED</b>。
 
-技能：  读完了，已存档。
-        正在查意大利领事馆官网、VFS Italy 伦敦、意大利外交部门户……
-        交叉核实完毕：签证费 90 欧元、保险至少 3 万欧元、
-        照片 35×45mm、EES 自 2025 年 10 月起在边境生效。
+<p align="center"><img src="assets/demo-status-granted.png" alt="已批准的状态页" width="800" /></p>
+</details>
 
-        你已经预约 VFS 了吗？ [你回答]
-        好的 —— 通过 Chrome MCP 在 VFS Italy 伦敦中心预约。
-        到付款环节会停下来 —— 银行卡信息由你自己填。
+<details>
+<summary><b>预约日清单</b> —— 一页速查表</summary>
+<br>
+<p align="center"><img src="assets/demo-checklist.png" alt="清单页" width="800" /></p>
 
-你：    [付款、确认时段]
+包含：出门前检查项、文件堆叠顺序、官员可能的提问及建议回答、已验证的交叉检查、需要自行确认的事项。
+</details>
 
-技能：  预约已记录：6 月 4 日（周三）10:00，Pocock St。
-        正在生成签证说明信、在职证明草稿、通过 e-applicationvisa.esteri.it
-        填写的申请表（含 2D 条码）、以及一页清单。
+<details>
+<summary><b>签证说明信</b> —— 一页正式信函</summary>
+<br>
+<p align="center"><img src="assets/demo-cover-letter.png" alt="求职信" width="700" /></p>
+</details>
 
-        发现一处问题：酒店退房日期晚于回程航班一天。
+### 工作流程
 
-你：    [签字、打印、去 VFS]
-
-       (……几周后，旅行结束之后……)
-
-你：    意大利签证有消息了 —— 批了，签证贴在这里。
-
-技能：  已记录：签证 1234567，有效期 5 月 22 → 11 月 22，
-        多次入境，90 天。已存入 visa_history —— 下次申根申请
-        会自动填入「曾获签证」那一栏。
-```
+技能运行 **9 个阶段**的严格流程：搜索 → 提问 → 建档 → 文件夹 → 调研 → 预约 → 生成文档 → 交叉检查 → 提交后跟踪。
 
 **首次申请：约 45 分钟。之后每次：约 10 分钟。**
 
-### 你会得到
+### 核心功能
 
-- 一份可复用的个人资料，存于 `~/.claude/visa-profile.json` —— 护照、地址、公司、银行。建一次，以后每次自动填入。
-- 完整材料包 —— 签证说明信、在职证明草稿、填好的申请表、清单 PDF。技能自己填表：优先走官方在线门户，其次编辑可填 PDF，再不行就用视觉定位叠加文字 —— 手动填写是最后手段。
-- 一个按签证官翻阅顺序编号的 Print Pack 文件夹。A4 打印、签字、直接递交。
+- **可复用个人资料** `~/.claude/visa-profile.json` —— 护照、地址、公司、银行、签证历史。拖入文件自动提取，一次建档以后每次自动填入。
+- **交叉验证调研** —— 领事馆官网 + 签证中心 + 第三方指南，每项关键信息至少两个来源。
+- **智能表格填写** —— 四级策略：在线门户 → 可填PDF → 视觉定位叠加 → 手动填写数据表。技能自己填表，手动填写是最后手段。
+- **跨会话连续性** —— `application_status.html` 跟踪进度，随时可中断再继续。
+- **文件摄入** —— 拖入护照扫描件、工资单、银行流水，自动提取结构化数据并交叉检查。
+- **时间智能** —— 警告过期文件、处理时间风险、旺季积压、护照有效期陷阱。
 
 ### 安装
-
-**macOS / Linux / WSL / Git Bash：**
 
 ```bash
 mkdir -p ~/.claude/skills
 git clone https://github.com/Shadowhusky/visa-application.git ~/.claude/skills/visa-application
 ```
 
-**Windows PowerShell：**
-
-```powershell
-New-Item -ItemType Directory -Force -Path "$HOME\.claude\skills" | Out-Null
-git clone https://github.com/Shadowhusky/visa-application.git "$HOME\.claude\skills\visa-application"
-```
-
-没有 git 或遇到问题？请看 [INSTALL.md](INSTALL.md) —— 包含 ZIP 下载、安装验证、常见问题排查（公司代理、路径带空格、`/skills` 找不到技能等）。
-
-之后在任何 Claude Code 会话里提到签证，技能就会接管。
+详见 [INSTALL.md](INSTALL.md)。之后在任何 Claude Code 会话里提到签证，技能就会接管。
 
 ### 覆盖范围
 
 申根（全部 27 国）、美国 B1/B2、英国旅游签、日本、加拿大、中国、澳大利亚 —— 任何有公开签证流程的国家。
 
-### 不适用于
-
-庇护、家庭团聚、或任何需要专业移民律师的情况。付款始终由你完成 —— 技能绝不会输入银行卡信息。
-
 ### 隐私
 
-个人资料仅保存在本地，绝不外传。申请文件夹默认在 `~/Documents/Visa Applications/{国家}-{年份}/`。
+个人资料仅保存在本地，绝不外传。
 
 ### 许可
 
@@ -208,96 +306,55 @@ MIT。
 <a id="español"></a>
 ## Español
 
-Un skill de Claude Code que te lleva de *"necesito un visado"* a un paquete de documentos impreso y listo para el funcionario.
+Un skill de Claude Code que te lleva de *"necesito un visado"* a un paquete de documentos impreso y listo para el funcionario — en una sola sesion.
 
-### Por qué
+### Por que
 
-Las normas de visado cambian cada trimestre. La mitad de las guías online siguen reciclando información de 2019. La web del consulado está enterrada a dos clics y lleva tres años sin actualizarse. Olvida un documento y esperarás otro mes para una nueva cita.
+Las normas de visado cambian cada trimestre. La mitad de las guias online siguen reciclando informacion de 2019. La web del consulado esta enterrada a dos clics y lleva tres anos sin actualizarse. Olvida un documento y esperaras otro mes para una nueva cita.
 
-Este skill mantiene las normas actualizadas y los papeles ordenados. Tú haces lo que solo tú puedes — vuelos, fotos, firmar cosas. Del resto se encarga el skill.
+Este skill mantiene las normas actualizadas y los papeles ordenados. Tu haces lo que solo tu puedes — vuelos, fotos, firmar cosas. Del resto se encarga el skill.
 
-### Demo
+### Que produce
 
-```
-Tú:      Necesito un visado Schengen para Italia desde el Reino Unido.
-         Viaje del 22 al 26 de junio.
+Cada solicitud tiene su propia carpeta con documentos HTML visibles en el navegador, PDFs correspondientes para imprimir, y un Print Pack numerado en el orden que el funcionario espera.
 
-Skill:   Cuatro preguntas rápidas… [respondes]
-         No hay perfil — arrastra aquí tu pasaporte, una nómina y un
-         extracto bancario.
+<details>
+<summary><b>Rastreador de estado</b></summary>
+<br>
+<p align="center"><img src="assets/demo-status.png" alt="Pagina de estado" width="800" /></p>
+<p align="center"><img src="assets/demo-status-granted.png" alt="Estado aprobado" width="800" /></p>
+</details>
 
-Tú:      [suelta 3 archivos]
+<details>
+<summary><b>Checklist del dia de la cita</b></summary>
+<br>
+<p align="center"><img src="assets/demo-checklist.png" alt="Checklist" width="800" /></p>
+</details>
 
-Skill:   Leídos. Perfil guardado.
-         Investigando con el consulado italiano, VFS Italy Londres y
-         el portal del MAE… validado: tasa €90, seguro €30k, foto
-         35×45mm, EES activo en frontera desde octubre 2025.
-
-         ¿Ya tienes la cita reservada?  [respondes]
-         OK — reservando en VFS Italy Londres vía Chrome MCP.
-         Paro en el paso de pago — tú introduces la tarjeta.
-
-Tú:      [pagas, confirmas la cita]
-
-Skill:   Cita capturada: miércoles 4 de junio, 10:00, Pocock St.
-         Generando carta de presentación, borrador de carta laboral,
-         formulario vía e-applicationvisa.esteri.it (con código 2D),
-         y una lista de verificación de una página.
-
-         Detectado un problema: la salida del hotel es un día
-         posterior al vuelo de regreso.
-
-Tú:      [firma, imprime, va al VFS]
-
-       (… semanas después, ya hecho el viaje …)
-
-Tú:      Novedades del visado: aprobado, aquí está la etiqueta.
-
-Skill:   Capturado: visado 1234567, vigente 22 may → 22 nov,
-         entradas múltiples, 90 días. Guardado en visa_history —
-         la próxima solicitud Schengen lo usará automáticamente
-         para la pregunta de "visados anteriores".
-```
+<details>
+<summary><b>Carta de presentacion</b></summary>
+<br>
+<p align="center"><img src="assets/demo-cover-letter.png" alt="Carta de presentacion" width="700" /></p>
+</details>
 
 **Primer visado: ~45 minutos. Cada visado siguiente: ~10 minutos.**
 
-### Lo que obtienes
-
-- Un perfil reutilizable en `~/.claude/visa-profile.json` — pasaporte, dirección, empresa, banco. Se crea una vez, se reutiliza en cada solicitud.
-- Un paquete documental — carta de presentación, borrador de carta laboral, formulario relleno, lista de verificación en PDF. El skill rellena el formulario automáticamente: portal oficial, PDF interactivo o superposición con visión — transcripción manual solo como último recurso.
-- Una carpeta Print Pack numerada en orden de revisión del funcionario. Imprime en A4, firma, entra.
-
-### Instalación
-
-**macOS / Linux / WSL / Git Bash:**
+### Instalacion
 
 ```bash
 mkdir -p ~/.claude/skills
 git clone https://github.com/Shadowhusky/visa-application.git ~/.claude/skills/visa-application
 ```
 
-**Windows PowerShell:**
-
-```powershell
-New-Item -ItemType Directory -Force -Path "$HOME\.claude\skills" | Out-Null
-git clone https://github.com/Shadowhusky/visa-application.git "$HOME\.claude\skills\visa-application"
-```
-
-¿Sin git, o algún problema? Consulta [INSTALL.md](INSTALL.md) — incluye descarga ZIP, verificación, y solución de problemas (proxy corporativo, rutas con espacios, `/skills` no muestra la skill, etc).
-
-Después, en cualquier sesión de Claude Code, menciona un visado. El skill se hace cargo.
+Consulta [INSTALL.md](INSTALL.md) para mas opciones. Despues, en cualquier sesion de Claude Code, menciona un visado.
 
 ### Cobertura
 
-Schengen (los 27 países), EE. UU. B1/B2, UK Visitor, Japón, Canadá, China, Australia — cualquier país con un proceso de visado documentado.
-
-### No sirve para
-
-Asilo, reagrupación familiar, o cualquier caso que requiera un abogado de inmigración. Los pagos siempre los haces tú — el skill nunca introduce datos de tarjeta.
+Schengen (los 27 paises), EE. UU. B1/B2, UK Visitor, Japon, Canada, China, Australia — cualquier pais con un proceso de visado documentado.
 
 ### Privacidad
 
-El perfil es local, nunca se transmite. Las carpetas de solicitud van por defecto a `~/Documents/Visa Applications/{País}-{Año}/`.
+El perfil es local, nunca se transmite. Las carpetas de solicitud van por defecto a `~/Documents/Visa Applications/{Pais}-{Ano}/`.
 
 ### Licencia
 
@@ -308,7 +365,7 @@ MIT.
 <a id="हिन्दी"></a>
 ## हिन्दी
 
-एक Claude Code skill जो आपको *"मुझे वीज़ा चाहिए"* से लेकर प्रिंट करके अधिकारी को सौंपने लायक पूरे दस्तावेज़ पैक तक पहुँचाती है।
+एक Claude Code skill जो आपको *"मुझे वीज़ा चाहिए"* से लेकर प्रिंट करके अधिकारी को सौंपने लायक पूरे दस्तावेज़ पैक तक पहुँचाती है — एक ही सत्र में।
 
 ### क्यों
 
@@ -316,82 +373,43 @@ MIT.
 
 यह skill नियमों को अपडेट रखती है और कागज़ात व्यवस्थित। आप वही करते हैं जो केवल आप कर सकते हैं — फ़्लाइट बुक करना, फ़ोटो खिंचवाना, साइन करना। बाकी सब यह करती है।
 
-### डेमो
+### यह क्या बनाती है
 
-```
-आप:     मुझे यूके से इटली के लिए Schengen वीज़ा चाहिए। यात्रा 22-26 जून।
+हर आवेदन का अपना फ़ोल्डर, ब्राउज़र में देखने योग्य HTML दस्तावेज़, प्रिंट के लिए PDF, और अधिकारी के पलटने के क्रम में नंबर वाला Print Pack।
 
-Skill:  चार छोटे सवाल… [आप जवाब देते हैं]
-        अभी कोई प्रोफ़ाइल नहीं — पासपोर्ट, payslip, और bank
-        statement यहाँ ड्रॉप करें।
+<details>
+<summary><b>आवेदन स्थिति ट्रैकर</b></summary>
+<br>
+<p align="center"><img src="assets/demo-status.png" alt="स्थिति पेज" width="800" /></p>
+<p align="center"><img src="assets/demo-status-granted.png" alt="स्वीकृत स्थिति" width="800" /></p>
+</details>
 
-आप:     [3 फ़ाइलें ड्रॉप करते हैं]
+<details>
+<summary><b>अपॉइंटमेंट-डे चेकलिस्ट</b></summary>
+<br>
+<p align="center"><img src="assets/demo-checklist.png" alt="चेकलिस्ट" width="800" /></p>
+</details>
 
-Skill:  पढ़ लिए। प्रोफ़ाइल सेव हो गई।
-        इटालियन कॉन्सुलेट पेज, VFS Italy लंदन, और MFA पोर्टल
-        चेक कर रही हूँ… क्रॉस-वेरिफ़ाइड: €90 फ़ीस, €30k बीमा,
-        35×45mm फ़ोटो, EES अक्टूबर 2025 से बॉर्डर पर चालू।
-
-        क्या आपने अपॉइंटमेंट बुक कर ली है?  [आप जवाब देते हैं]
-        ठीक है — Chrome MCP के ज़रिए VFS Italy London बुक कर रही हूँ।
-        Payment step पर रुक रही हूँ — card details आप डालें।
-
-आप:     [पेमेंट, स्लॉट कन्फ़र्म]
-
-Skill:  अपॉइंटमेंट नोट कर ली: बुध 4 जून, 10:00, Pocock St।
-        कवर लेटर, employment letter draft, e-applicationvisa.esteri.it
-        के ज़रिए भरा गया फ़ॉर्म (2D बारकोड के साथ), और एक-पेज
-        चेकलिस्ट तैयार कर रही हूँ।
-
-        एक दिक्कत मिली: होटल चेकआउट रिटर्न फ़्लाइट के एक दिन बाद है।
-
-आप:     [साइन करते हैं, प्रिंट करते हैं, VFS जाते हैं]
-
-       (… कुछ हफ़्ते बाद, यात्रा के बाद …)
-
-आप:     इटली वीज़ा का अपडेट — मंज़ूर हो गया, स्टिकर यहाँ है।
-
-Skill:  दर्ज कर लिया: वीज़ा 1234567, valid 22 मई → 22 नवंबर,
-        multiple entries, 90 दिन। visa_history में सेव — अगली
-        Schengen एप्लीकेशन में "पिछले वीज़े" वाले सवाल
-        में अपने आप भर जाएगा।
-```
+<details>
+<summary><b>कवर लेटर</b></summary>
+<br>
+<p align="center"><img src="assets/demo-cover-letter.png" alt="कवर लेटर" width="700" /></p>
+</details>
 
 **पहला वीज़ा: ~45 मिनट। उसके बाद हर वीज़ा: ~10 मिनट।**
 
-### आपको क्या मिलता है
-
-- एक reusable प्रोफ़ाइल `~/.claude/visa-profile.json` पर — पासपोर्ट, पता, कंपनी, बैंक। एक बार बनाओ, बार-बार काम आएगी।
-- एक दस्तावेज़ पैक — कवर लेटर, employment letter ड्राफ़्ट, भरा हुआ application फ़ॉर्म, चेकलिस्ट PDF। Skill फ़ॉर्म खुद भरती है: ऑनलाइन पोर्टल, interactive PDF, या vision overlay — हाथ से भरना केवल अंतिम विकल्प।
-- एक numbered Print Pack फ़ोल्डर, ऑफ़िसर के पेज पलटने के क्रम में। A4 प्रिंट करें, साइन करें, सबमिट करें।
-
 ### इंस्टॉल
-
-**macOS / Linux / WSL / Git Bash:**
 
 ```bash
 mkdir -p ~/.claude/skills
 git clone https://github.com/Shadowhusky/visa-application.git ~/.claude/skills/visa-application
 ```
 
-**Windows PowerShell:**
-
-```powershell
-New-Item -ItemType Directory -Force -Path "$HOME\.claude\skills" | Out-Null
-git clone https://github.com/Shadowhusky/visa-application.git "$HOME\.claude\skills\visa-application"
-```
-
-Git नहीं है या कोई दिक्कत? देखें [INSTALL.md](INSTALL.md) — इसमें ZIP डाउनलोड, verification, और common issues का solution है (corporate proxy, स्पेस वाले paths, `/skills` में skill न दिखे, वगैरह)।
-
-फिर किसी भी Claude Code सेशन में वीज़ा का ज़िक्र करें। Skill संभाल लेगी।
+देखें [INSTALL.md](INSTALL.md)। फिर किसी भी Claude Code सेशन में वीज़ा का ज़िक्र करें।
 
 ### कवरेज
 
 Schengen (सभी 27 देश), US B1/B2, UK Visitor, जापान, कनाडा, चीन, ऑस्ट्रेलिया — कोई भी देश जिसकी वीज़ा प्रक्रिया दस्तावेज़ित हो।
-
-### इसके लिए नहीं
-
-Asylum, family reunification, या कोई भी मामला जिसमें पेशेवर immigration lawyer चाहिए। Payment हमेशा आप करते हैं — skill कभी card details enter नहीं करती।
 
 ### गोपनीयता
 
