@@ -88,7 +88,7 @@ doc.save("filled.pdf")
 
 Only when Tiers 1–3 all fail (which should be very rare):
 
-Produce a `application_form_data.md` table with every field name and the value to copy in. Hand the user the blank printed form plus this sheet, and they transcribe. This is a last resort because the user typing 80 fields from a sheet is exactly the friction this skill exists to remove.
+Generate `application_form_data.html` (+ PDF via `render-pdf.sh`) from `templates/form-data.html` — a styled table with every field name and the value to copy in. Hand the user the blank printed form plus this sheet, and they transcribe. This is a last resort because the user typing 80 fields from a sheet is exactly the friction this skill exists to remove.
 
 ## Quality verification — every tier
 

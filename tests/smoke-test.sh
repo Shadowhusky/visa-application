@@ -31,6 +31,9 @@ for f in SKILL.md README.md INSTALL.md LICENSE \
          templates/cover-letter.html \
          templates/employment-letter.html \
          templates/checklist.html \
+         templates/application-status.html \
+         templates/form-data.html \
+         templates/questionnaire.html \
          scripts/render-pdf.sh \
          scripts/find-existing.sh \
          scripts/build-print-pack.sh; do
@@ -56,6 +59,11 @@ grep -q 'APPLICANT_FULL_NAME' "$ROOT/templates/cover-letter.html" && ok "cover-l
 grep -q 'DESTINATION_COUNTRY' "$ROOT/templates/cover-letter.html" && ok "cover-letter has DESTINATION_COUNTRY" || no "cover-letter missing DESTINATION_COUNTRY"
 grep -q 'EMPLOYER_NAME' "$ROOT/templates/employment-letter.html" && ok "employment-letter has EMPLOYER_NAME" || no "employment-letter missing EMPLOYER_NAME"
 grep -q 'STACK_ORDER_ROWS_PLACEHOLDER' "$ROOT/templates/checklist.html" && ok "checklist has STACK_ORDER_ROWS_PLACEHOLDER" || no "checklist missing STACK_ORDER_ROWS_PLACEHOLDER"
+grep -q 'APPLICATION_STATUS' "$ROOT/templates/application-status.html" && ok "application-status has APPLICATION_STATUS" || no "application-status missing APPLICATION_STATUS"
+grep -q 'PROGRESS_ROWS_PLACEHOLDER' "$ROOT/templates/application-status.html" && ok "application-status has PROGRESS_ROWS_PLACEHOLDER" || no "application-status missing PROGRESS_ROWS_PLACEHOLDER"
+grep -q 'FORM_ROWS_PLACEHOLDER' "$ROOT/templates/form-data.html" && ok "form-data has FORM_ROWS_PLACEHOLDER" || no "form-data missing FORM_ROWS_PLACEHOLDER"
+grep -q 'FORM_SECTIONS_PLACEHOLDER' "$ROOT/templates/questionnaire.html" && ok "questionnaire has FORM_SECTIONS_PLACEHOLDER" || no "questionnaire missing FORM_SECTIONS_PLACEHOLDER"
+grep -q 'PREFILLED_JSON_PLACEHOLDER' "$ROOT/templates/questionnaire.html" && ok "questionnaire has PREFILLED_JSON_PLACEHOLDER" || no "questionnaire missing PREFILLED_JSON_PLACEHOLDER"
 
 echo
 echo "[5/6] No personal data leaks"

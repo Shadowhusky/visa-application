@@ -84,7 +84,7 @@ Skip the 4-question kickoff entirely. The profile already has identity, residenc
 
 Branch the rest of the workflow based on the answer:
 
-- **Continue existing** — read the application folder's `application_status.md` to figure out what's already done and what's outstanding. Jump to the *first* incomplete phase (could be appointment booking, document upload, form filling, or just the cross-check). Don't restart from Phase 1.
+- **Continue existing** — read the application folder's `application_status.html` to figure out what's already done and what's outstanding. Jump to the *first* incomplete phase (could be appointment booking, document upload, form filling, or just the cross-check). Don't restart from Phase 1.
 - **Start new application** — do the 4-question kickoff to get destination/dates for a fresh application.
 - **Update profile** — ask what specifically changed (new job, new address, renewed passport, etc.) and save to `~/.claude/visa-profile.json` without starting any application workflow.
 - **Something else** — free-text follow-up to understand intent.
@@ -115,6 +115,52 @@ When a user pastes or attaches a file:
 
 The user shouldn't have to retype data that's already on a document they have. The flow should feel like *"drop the file, get a short summary back, move on"*.
 
+### Questionnaire form — when you need 4+ answers
+
+**Never dump a multi-question text wall.** If you need 4 or more free-text answers from the user (remaining profile fields after document intake, visa-form-specific questions like parents' names / education history / travel history, etc.), generate an interactive HTML questionnaire instead.
+
+**When to use:**
+
+- **≤ 3 questions** → ask in chat (one message, or `AskUserQuestion` if multiple-choice).
+- **4+ questions** → generate `questionnaire.html` in the application folder.
+
+**How to generate:**
+
+1. Identify every missing field. Group them into logical sections (e.g., "Family", "Education", "Travel history").
+2. Build the form by substituting placeholders in `templates/questionnaire.html`:
+   - `QUESTIONNAIRE_TITLE` — e.g., "US B1/B2 Visa — Additional Information"
+   - `QUESTIONNAIRE_SUBTITLE` — e.g., "Fill in the fields below. Green fields are pre-filled from your profile."
+   - `OUTPUT_FILENAME` — e.g., "ds160-answers.json"
+   - `PREFILLED_JSON_PLACEHOLDER` — JSON object of values already known from the profile
+   - `FORM_SECTIONS_PLACEHOLDER` — the dynamic fieldset blocks (see format below)
+3. Write the filled HTML to the application folder.
+4. Tell the user: *"Open {path}/questionnaire.html in your browser, fill in the fields, click Save. Come back here and say 'done' when finished."*
+5. When the user says "done", find and read the downloaded JSON file:
+   ```bash
+   find ~/Downloads -name "OUTPUT_FILENAME" -newer "{app-folder}/questionnaire.html" 2>/dev/null
+   ```
+6. Parse the JSON and write every answer into `visa-profile.json` and/or the application-specific state.
+
+**Fieldset format** for `FORM_SECTIONS_PLACEHOLDER`:
+
+```html
+<fieldset data-section="family">
+  <legend>Family</legend>
+  <div class="field">
+    <label for="father_name">Father — full name (pinyin)</label>
+    <input type="text" id="father_name" name="father_name" placeholder="e.g., ZHANG WEI">
+  </div>
+  <div class="field">
+    <label for="father_dob">Father — date of birth</label>
+    <input type="date" id="father_dob" name="father_dob">
+  </div>
+</fieldset>
+```
+
+Use the right input type for each field: `type="date"` for dates, `type="tel"` for phone numbers, `type="email"` for email, `<textarea>` for multi-line answers (travel history, prior employment), `<select>` for fixed-choice fields. Use the `class="field-row"` wrapper to pair two short fields side-by-side (e.g., first name + last name, from-date + to-date).
+
+**Pre-population:** every field the profile already has gets pre-filled (green tint in the UI). The user only types what's missing. If the profile already covers 60% of the fields, the form is 60% done before the user even opens it.
+
 ### Phase 3 — Locate or create the application folder
 
 Each application gets its own folder. **Always search first** for an existing one the user may have started:
@@ -143,10 +189,16 @@ Inside the application folder, you'll later create:
 
 ```
 {destination}-{year}/
-├── Cover Letter.pdf
-├── Employment Letter.pdf            (if employed)
-├── Visa-application-form-FILLED.pdf (if portal exists) or application_form_data.md
-├── application_status.md             (running state — schema below)
+├── Cover Letter.html                 ← opens in browser
+├── Cover Letter.pdf                  ← PDF fallback / print
+├── Employment Letter.html            (if employed)
+├── Employment Letter.pdf
+├── Visa-application-form-FILLED.pdf  (if portal exists)
+│   or application_form_data.html + .pdf  (Tier 4 fallback)
+├── Checklist.html
+├── Checklist.pdf
+├── application_status.html           ← running state (schema below)
+├── Application Status.pdf
 ├── (user-provided documents the user drops in)
 └── Print Pack/
     ├── 00 - CHECKLIST.pdf
@@ -154,45 +206,26 @@ Inside the application folder, you'll later create:
     └── …
 ```
 
-#### `application_status.md` schema
+Every skill-generated document has both `.html` (for browser viewing) and `.pdf` (for mobile / print). User-provided uploads (passport scans, bank statements, etc.) stay in their original format.
 
-This file is the source of truth for multi-session continuity. Phase 0 reads it via the folder search; Phase 1's "Continue" branch resumes from it; Phase 7 writes to it; Phase 8 reads it to decide which post-submission branch to enter. Use this exact markdown structure (human-readable, machine-parseable enough for the agent):
+#### `application_status.html` schema
 
-```markdown
-# Application status
+This file is the source of truth for multi-session continuity. Phase 0 reads it via the folder search; Phase 1's "Continue" branch resumes from it; Phase 7 writes to it; Phase 8 reads it to decide which post-submission branch to enter. Use the `templates/application-status.html` template — substitute ALL_CAPS placeholders with real values. The result is a styled HTML page that opens in any browser and is still easy for the agent to parse via the Read tool.
 
-- **Status:** in_progress | submitted | awaiting_decision | granted | refused
-- **Destination:** Italy
-- **Visa type:** Schengen Tourist (Type C)
-- **Trip dates:** 2026-06-22 → 2026-06-26
-- **Last updated:** 2026-05-25
+The status badge uses one of: `in_progress`, `submitted`, `awaiting_decision`, `granted`, `refused` — set both the badge text and the CSS class (`status-in_progress`, etc.) to match.
 
-## Appointment
-- **Date/time:** 2026-05-27 09:45
-- **Centre:** VFS Italy London
-- **Address:** Ground Floor, 8-20 Pocock St, London SE1 0BW
-- **Reference:** ITA122217594459
-- **Tracking URL:** https://visa.vfsglobal.com/gbr/en/ita/track-application
+Progress rows use the `PROGRESS_ROWS_PLACEHOLDER` marker. Each row is an `<li>` with class `done` or `todo`:
 
-## Progress checklist
-- [x] Research complete
-- [x] Profile loaded
-- [x] Documents uploaded by user
-- [x] Appointment booked
-- [x] Visa application form filled
-- [x] Cover letter generated
-- [x] Print Pack assembled
-- [ ] Submitted at centre
-- [ ] Decision received
+```html
+<li class="done">Research complete</li>
+<li class="done">Profile loaded</li>
+<li class="todo">Submitted at centre</li>
+```
 
-## Outcome
-*(filled in Phase 8 when granted or refused)*
-- **Decided on:** —
-- **Visa sticker number:** —
-- **Valid:** —
-- **Entries:** —
-- **Days of stay:** —
-- **Notes:** —
+After substituting placeholders, also render the HTML to PDF via `render-pdf.sh` so the user has both formats:
+
+```bash
+bash scripts/render-pdf.sh "{application-folder}/application_status.html" "{application-folder}/Application Status.pdf"
 ```
 
 Keep this file updated at the end of every phase that changes state. Re-write the whole file (not just append) so it remains a clean snapshot.
@@ -278,15 +311,42 @@ After Phase 5 settles an appointment date, automatically check:
 
 If any check fails, surface to user *before* generating documents — there's no point producing a Print Pack against stale evidence.
 
-For each document type, prefer the proven approach — render HTML via Chrome headless to PDF.
+#### Dual output: HTML + PDF for every generated document
+
+Every document the skill generates is produced as **both HTML and PDF**:
+
+- **HTML** — the primary format. Opens styled in any desktop browser. Keeps the application folder browsable and inspectable without special tools.
+- **PDF** — the automatic fallback. Rendered from the HTML via `render-pdf.sh`. Opens on mobile, prints cleanly, goes into the Print Pack.
+
+The workflow for each document:
+
+1. Substitute placeholders in the relevant `templates/*.html` file.
+2. Write the filled HTML to the application folder (e.g., `Cover Letter.html`).
+3. Render the HTML to PDF:
 
 ```bash
-bash scripts/render-pdf.sh templates/cover-letter.html /tmp/cover.html "{application-folder}/Cover Letter.pdf"
+bash scripts/render-pdf.sh "{application-folder}/Cover Letter.html" "{application-folder}/Cover Letter.pdf"
 ```
 
 (See `scripts/render-pdf.sh` for the canonical invocation. It uses Chrome headless on macOS; for Linux/Windows the script self-adjusts.)
 
-Documents to produce, in order:
+If `render-pdf.sh` fails (no Chrome, no fallback renderer), keep the HTML — it's still usable — and warn the user that PDF generation failed.
+
+#### Progress updates during generation
+
+Don't generate all documents silently. After each document is written, tell the user in one line:
+
+```
+Wrote: Cover Letter.html + .pdf
+Wrote: Employment Letter.html + .pdf
+Wrote: Checklist.html + .pdf
+Assembling Print Pack…
+Print Pack ready (7 files).
+```
+
+This keeps the user informed without flooding them. The full manifest and review instructions come in Phase 7.
+
+#### Documents to produce, in order
 
 1. **Cover letter** — addressed to "Visa Section, Consulate General of {destination}, {origin city}". One page. State purpose, dates, employment, self-funding, and reference to enclosed evidence. Avoid promising things the documents don't back. See `templates/cover-letter.html`.
 2. **Employment letter** — if employed. Should be signed by manager or HR on company letterhead. Render a draft, give to user, they get it signed. See `templates/employment-letter.html`.
@@ -295,10 +355,11 @@ Documents to produce, in order:
    - **Tier 1 — Online portal.** If the destination has an official portal (Italy `e-applicationvisa.esteri.it`, France `france-visas.gouv.fr`, US DS-160 `ceac.state.gov`, etc.), load the Chrome browser MCP via ToolSearch and fill the portal page-by-page using profile data. The portal generates a PDF with a 2D barcode the officer scans. This is the cleanest output.
    - **Tier 2 — Interactive PDF.** If no portal but the PDF has AcroForm fields (`pymupdf` detects this via `doc.is_form_pdf`), fill the named fields directly. Perfect alignment guaranteed.
    - **Tier 3 — Vision-driven coordinate overlay.** If the PDF is flat, render the blank to PNG, use vision to read field positions, overlay text via pymupdf, **re-render and verify visually**, refine coordinates until clean. Don't stop at first attempt — inspect the result and adjust.
-   - **Tier 4 — Data sheet for manual transcription.** Only if 1–3 all fail (genuinely rare). Hand the user a one-page sheet of values to copy onto the printed form.
+   - **Tier 4 — Data sheet for manual transcription.** Only if 1–3 all fail (genuinely rare). Generate `application_form_data.html` + PDF from `templates/form-data.html` — a styled table of field names and values. Hand the user the blank printed form plus this sheet, and they transcribe.
 
    **Quality gate:** every tier must end with the agent visually inspecting the rendered output. Offset, overlapping, or otherwise messy PDFs are not "done" — drop down to the next tier rather than ship a poor result.
-4. **Checklist PDF (00 - CHECKLIST.pdf)** — a one-page summary the user prints as the cover sheet of the Print Pack. See `templates/checklist.html`. Include: appointment time/place, before-leaving-home tick list, the numbered stack order, likely officer questions and how to answer them, and the cross-checks you've already verified.
+4. **Checklist (00 - CHECKLIST)** — a one-page summary the user prints as the cover sheet of the Print Pack. See `templates/checklist.html`. Include: appointment time/place, before-leaving-home tick list, the numbered stack order, likely officer questions and how to answer them, and the cross-checks you've already verified.
+5. **Application status** — the running state tracker. See `templates/application-status.html`. Updated at the end of every phase that changes state.
 
 After documents are generated, assemble the Print Pack:
 
@@ -306,28 +367,73 @@ After documents are generated, assemble the Print Pack:
 bash scripts/build-print-pack.sh "{application-folder}"
 ```
 
-This copies (not moves — keep originals) each PDF into a `Print Pack/` subfolder with a numbered, human-readable prefix in the order an officer flips through them.
+This copies (not moves — keep originals) each PDF into a `Print Pack/` subfolder with a numbered, human-readable prefix in the order an officer flips through them. The Print Pack uses PDFs only; the HTML copies stay in the main folder for easy browsing.
 
 ### Phase 7 — Final cross-check report
 
-Tell the user what's done, what's still pending, and what specifically to bring to the appointment. Use this exact template:
+This is the user's single summary of everything the skill has done. It must be concrete and actionable — file paths the user can click, things to check, things to print. Use this exact three-part template:
+
+#### Part 1 — Document manifest
+
+List every file in the application folder, grouped by purpose. The user should be able to open Finder / Explorer to the folder and match what they see to this list.
 
 ```
-✅ Compliant out of the box: <list of items already met>
-❌ Still needed before {appointment date}: <action items>
-⚠️ Items the user must verify themselves: <e.g., recent immigration status, fund balance>
-📦 At the appointment: <{currency}{amount} visa fee, biometric photos, original passport>
+📂 {application-folder-path}
+
+   Documents to review (double-click the .html to preview in your browser):
+   ├── Cover Letter.html / .pdf         — review wording, sign the PDF
+   ├── Employment Letter.html / .pdf    — forward to HR for signature on letterhead
+   ├── Checklist.html / .pdf            — your appointment-day cheat sheet
+   ├── application_status.html / .pdf   — tracks what's done and what's pending
+   └── (any other generated documents)
+
+   Documents you provided:
+   ├── passport-bio.pdf
+   ├── payslip-2026-04.pdf
+   └── … (list each)
+
+   Ready to print:
+   └── Print Pack/
+       ├── 00 - CHECKLIST.pdf
+       ├── 01 - …
+       └── … (numbered in officer flip-order — print all, single-sided, A4)
 ```
 
-Surface any inconsistency you find — better to flag a date mismatch now than have the officer find it.
+#### Part 2 — Cross-checks
 
-Write the same content to `{application-folder}/application_status.md` so the next invocation (Phase 0 + warm-start "Continue") can read where things stand without re-prompting the user.
+```
+✅ Compliant: <list of items already verified>
+❌ Still needed before {appointment date}: <specific action items>
+⚠️ Verify yourself: <items the skill can't confirm, e.g., fund balance, immigration status>
+📦 Bring to appointment: <visa fee amount + currency, biometric photos, original passport>
+```
+
+Surface any inconsistency found — date mismatches, salary discrepancies, expired documents. Better to flag now than have the officer find it.
+
+#### Part 3 — Next steps
+
+A short numbered list of exactly what the user still has to do, in order:
+
+```
+1. Open Cover Letter.html — read it, make sure dates and employer are correct
+2. Forward Employment Letter.pdf to your HR — they sign on letterhead and return it
+3. Print everything in Print Pack/ — single-sided, A4, keep in numbered order
+4. Sign the visa form (page X) and the cover letter (bottom of page 1)
+5. Paperclip 2 biometric photos to file 04
+6. Bring: printed stack + original passport + payment card + phone
+```
+
+Tailor the list to what's actually outstanding for this application. Don't include steps that are already done.
+
+---
+
+After showing this to the user, write the same state to `{application-folder}/application_status.html` (and re-render its PDF) so the next invocation (Phase 0 + warm-start "Continue") can read where things stand without re-prompting the user.
 
 ### Phase 8 — Post-submission: tracking, collection, outcome
 
 The workflow doesn't end when the user walks out of the visa centre. Applications take days to weeks to decide, and the skill needs to be able to pick up the thread on a later invocation.
 
-**Trigger detection:** during Phase 0, after `find-existing.sh folder` returns a path, read that folder's `application_status.md`. If the `Status:` field is `submitted` or `awaiting_decision` or `granted` or `refused`, Phase 1's warm-start question shifts from the standard "Continue/New/Update" to the post-submission variant below.
+**Trigger detection:** during Phase 0, after `find-existing.sh folder` returns a path, read that folder's `application_status.html`. If the status badge reads `submitted` or `awaiting_decision` or `granted` or `refused`, Phase 1's warm-start question shifts from the standard "Continue/New/Update" to the post-submission variant below.
 
 **Warm-start question (post-submission variant):**
 
@@ -339,7 +445,7 @@ The workflow doesn't end when the user walks out of the visa centre. Application
 
 Help the user check status:
 
-1. Read the tracking URL from `application_status.md` (stored at the end of Phase 5).
+1. Read the tracking URL from `application_status.html` (stored at the end of Phase 5).
 2. Open the centre's tracking dashboard via browser MCP. Most centres need just the application reference + passport number.
 3. Report status to user. If status is "decision made — ready for collection", switch to Branch B.
 4. If status has been "submitted" for longer than the documented processing time + 5 days, flag it as unusually slow and surface the centre's escalation contact.
@@ -357,7 +463,7 @@ Capture from the user (or from the granted visa sticker PDF if courier-delivered
 Update:
 
 - `~/.claude/visa-profile.json` → append to `visa_history[]` with the full granted entry. The next application can answer "previous visas in last 3 years" precisely.
-- `application_status.md` → status `granted` with full visa details.
+- `application_status.html` (+ re-render PDF) → status `granted` with full visa details.
 
 Briefly remind the user of:
 
@@ -397,6 +503,7 @@ Throughout the workflow, default to acting. The user has limited time and wants 
 - **Don't ask the user to "verify" things you can verify yourself.** Cross-check passport DOB against profile DOB, flight dates against hotel dates, employer address against payslip header — automatically, in the background. Only surface the *discrepancies*, not the matches.
 - **Don't ask the user where to put files.** Default to `~/Documents/Visa Applications/{Country}-{Year}/` and only ask if the user previously indicated a different location.
 - **Don't pause to confirm trivial decisions.** Don't ask "should I generate the cover letter now?" — just generate it. Surface a summary at the end, not a confirmation at every step.
+- **Never dump a multi-question text wall.** A numbered list of 4+ free-text questions in chat is bad UX — the user has to scroll, retype, track what they've answered. If you need 4+ answers, generate `questionnaire.html` (see "Questionnaire form" section above). The user fills it at their own pace in a browser with proper form fields, pre-populated values, and a progress bar. This is a hard rule, not a suggestion.
 
 Where you *do* need to involve the user:
 
@@ -404,6 +511,7 @@ Where you *do* need to involve the user:
 - Wet signatures (printed forms only)
 - CAPTCHAs and biometric prompts
 - Genuinely ambiguous declarations (e.g., "are you in possession of any weapons?" — ask once, save to profile, reuse forever)
+- Data that can't be extracted from any document and has 4+ fields — use the questionnaire form, not chat
 
 ## Failure modes — how to fail gracefully
 
@@ -447,8 +555,11 @@ Also update `~/.claude/visa-history.json` with a summary of what was applied for
 | `templates/cover-letter.html` | Cover letter template, A4 single page |
 | `templates/employment-letter.html` | Employment letter template, A4 single page |
 | `templates/checklist.html` | Print Pack cover-sheet checklist |
+| `templates/application-status.html` | Application status tracker template |
+| `templates/form-data.html` | Tier 4 form-data sheet template (manual-transcription fallback) |
+| `templates/questionnaire.html` | Interactive HTML form for bulk data collection (replaces text-wall Q&A) |
 | `scripts/render-pdf.sh` | HTML → PDF via Chrome headless |
 | `scripts/find-existing.sh` | Search the user's machine for existing profile / folder |
 | `scripts/build-print-pack.sh` | Assemble the numbered Print Pack |
 | `tests/smoke-test.sh` | Structural sanity check (file presence, executable scripts, no leaked personal data, render pipeline) |
-| `tests/scenarios.md` | Ten end-to-end behavioural scenarios with expected agent responses |
+| `tests/scenarios.md` | Eleven end-to-end behavioural scenarios with expected agent responses |

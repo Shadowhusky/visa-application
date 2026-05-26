@@ -58,7 +58,7 @@ Run any of these by starting a fresh Claude Code session and pasting the **You**
 
 | | |
 |---|---|
-| State | Profile exists, application folder contains `application_status.md` with `Status: submitted` |
+| State | Profile exists, application folder contains `application_status.html` with status badge `submitted` |
 | You | "Update on my Italy visa." |
 | Expected | Banner → Phase 0 reads the status file → AskUserQuestion with the **post-submission variant** (Still waiting / Approved / Refused / Other) — NOT the standard warm-start |
 
@@ -98,7 +98,7 @@ Run any of these by starting a fresh Claude Code session and pasting the **You**
 | You | (answers "No, need to book now" to the Phase 5 question) |
 | Expected | Skill loads Chrome MCP via ToolSearch, opens the official booking URL, walks through centre/category/slot, **stops at the payment step**, waits for user to enter card details, captures the confirmation details after |
 
-**Pass criteria:** Skill never enters card details. Appointment details captured into `application_status.md` after user confirms payment.
+**Pass criteria:** Skill never enters card details. Appointment details captured into `application_status.html` (+ PDF) after user confirms payment.
 
 ---
 
@@ -106,7 +106,7 @@ Run any of these by starting a fresh Claude Code session and pasting the **You**
 
 | | |
 |---|---|
-| State | Application folder has `application_status.md` showing `Status: refused` |
+| State | Application folder has `application_status.html` with status badge `refused` |
 | You | "What now?" |
 | Expected | Phase 8 Branch C engages. Skill asks for the refusal letter or reason code, distinguishes documentary vs intent refusals, offers to draft an appeal letter, updates visa_history with `outcome: Refused` |
 
@@ -123,6 +123,18 @@ Run any of these by starting a fresh Claude Code session and pasting the **You**
 | Expected | Skill detects no portal (Tier 1 fails) → checks `doc.is_form_pdf` (Tier 2 fails) → renders blank PDF to PNG, uses vision to identify field positions, overlays text via pymupdf, **re-renders and visually inspects**, refines until clean (Tier 3). Only falls to Tier 4 (data sheet) if Tier 3 produces an unfixable mess |
 
 **Pass criteria:** Each tier transition is logged. Quality verification happens at end of each tier. Tier 4 is genuinely the last resort.
+
+---
+
+## Scenario 11 — Many missing fields triggers questionnaire form, not text wall
+
+| | |
+|---|---|
+| State | Profile exists but sparse (just passport + address). Destination is US B1/B2 (DS-160 needs parents, education, travel history, social media, etc.) |
+| You | (proceeding through Phase 6 — DS-160 form filling needs 10+ additional fields) |
+| Expected | Skill generates `questionnaire.html` in the application folder with all missing fields as form inputs. Pre-fills whatever the profile has (green fields). Tells user: "Open questionnaire.html in your browser, fill in the fields, click Save. Come back and say 'done'." Does **NOT** dump a numbered text-wall list of questions |
+
+**Pass criteria:** No multi-question text wall in chat. An HTML file is generated and the user is directed to open it. After user says "done", agent finds and reads the downloaded JSON. Fields are written into the profile.
 
 ---
 

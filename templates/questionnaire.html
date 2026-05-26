@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<!--
+  Questionnaire form — replaces free-text Q&A walls.
+  Used when the skill needs 4+ answers from the user (profile setup, form-specific data, etc.).
+  Replace ALL_CAPS placeholders. FORM_SECTIONS_PLACEHOLDER gets dynamic <fieldset> blocks.
+  PREFILLED_JSON_PLACEHOLDER gets a JSON object of known values to pre-populate.
+
+  User opens in browser → fills fields → clicks Save → JSON downloads → agent reads it.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QUESTIONNAIRE_TITLE</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; }
+html {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  font-size: 16px; line-height: 1.5; color: #1a1a1a;
+  background: #f5f5f7;
+  -webkit-text-size-adjust: 100%;
+}
+body { margin: 0; padding: 24px 16px 96px; min-height: 100dvh; }
+.container { max-width: 640px; margin: 0 auto; }
+
+/* --- Header --- */
+header { margin-bottom: 28px; }
+h1 { font-size: 1.4rem; font-weight: 700; margin: 0 0 4px; }
+.subtitle { color: #666; margin: 0 0 16px; font-size: 0.875rem; }
+
+/* --- Progress --- */
+.progress-wrap {
+  background: #e0e0e0; border-radius: 6px; height: 8px;
+  overflow: hidden; margin-bottom: 6px;
+}
+.progress-bar {
+  height: 100%; width: 0%; border-radius: 6px;
+  background: linear-gradient(90deg, #34c759, #30d158);
+  transition: width 0.3s ease;
+}
+.progress-text { font-size: 0.75rem; color: #888; margin: 0 0 8px; }
+
+/* --- Sections --- */
+fieldset {
+  border: none; background: #fff; border-radius: 12px;
+  padding: 20px 20px 12px; margin: 0 0 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+legend {
+  font-size: 0.8rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.8px; color: #555; padding: 0; margin-bottom: 12px;
+}
+
+/* --- Fields --- */
+.field { margin-bottom: 16px; }
+.field label {
+  display: block; font-size: 0.8125rem; font-weight: 600;
+  color: #333; margin-bottom: 5px;
+}
+.field .hint { font-size: 0.75rem; color: #999; margin: 3px 0 0; }
+
+input[type="text"], input[type="date"], input[type="email"],
+input[type="tel"], input[type="url"], input[type="number"],
+textarea, select {
+  display: block; width: 100%;
+  padding: 10px 12px;
+  font-size: 1rem; font-family: inherit; color: #1a1a1a;
+  background: #fafafa; border: 1.5px solid #d1d1d6;
+  border-radius: 8px; outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  -webkit-appearance: none; appearance: none;
+}
+select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='1.5' fill='none'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; }
+input:focus, textarea:focus, select:focus {
+  border-color: #007aff; background: #fff;
+  box-shadow: 0 0 0 3px rgba(0,122,255,0.12);
+}
+textarea { resize: vertical; min-height: 80px; }
+
+/* Pre-filled fields get a green tint */
+.prefilled { background: #f0faf0 !important; border-color: #a3d9a5 !important; }
+.prefilled:focus { border-color: #34c759 !important; box-shadow: 0 0 0 3px rgba(52,199,89,0.15) !important; }
+
+/* --- Inline field pairs (two short fields side-by-side) --- */
+.field-row { display: flex; gap: 12px; }
+.field-row > .field { flex: 1; min-width: 0; }
+
+/* --- Action bar --- */
+.actions {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: rgba(255,255,255,0.92); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid #e0e0e0;
+  padding: 12px 16px; padding-bottom: max(12px, env(safe-area-inset-bottom));
+  display: flex; gap: 10px; justify-content: center;
+  z-index: 10;
+}
+.btn {
+  padding: 11px 28px; font-size: 1rem; font-weight: 600;
+  border: none; border-radius: 10px; cursor: pointer;
+  min-height: 44px;
+  transition: opacity 0.15s, transform 0.1s;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn:active { opacity: 0.7; transform: scale(0.97); }
+.btn-primary { background: #007aff; color: #fff; flex: 1; max-width: 220px; }
+.btn-primary:hover { background: #0066d6; }
+.btn-secondary { background: #e8e8ed; color: #333; }
+.btn-secondary:hover { background: #d8d8dd; }
+
+/* --- Ghost button (clear draft) --- */
+.btn-ghost {
+  background: transparent; color: #999; font-size: 0.8125rem;
+  padding: 8px 12px; min-height: 36px;
+}
+.btn-ghost:hover { color: #c00; background: rgba(200,0,0,0.06); }
+
+/* --- Auto-save badge --- */
+.autosave-badge {
+  position: fixed; top: 12px; right: 16px;
+  font-size: 0.75rem; color: #999; z-index: 10;
+  opacity: 0; transition: opacity 0.3s;
+}
+.autosave-badge.show { opacity: 1; }
+.autosave-badge.saving { color: #007aff; }
+.autosave-badge.restored { color: #34c759; }
+
+/* --- Toast --- */
+.toast {
+  position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+  background: #1a1a1a; color: #fff; padding: 10px 20px;
+  border-radius: 10px; font-size: 0.875rem; font-weight: 500;
+  opacity: 0; transition: opacity 0.3s; pointer-events: none;
+  z-index: 20; text-align: center; max-width: calc(100vw - 32px);
+}
+.toast.show { opacity: 1; }
+
+/* --- Responsive --- */
+@media (max-width: 480px) {
+  body { padding: 16px 12px 96px; }
+  h1 { font-size: 1.25rem; }
+  fieldset { padding: 16px 14px 8px; border-radius: 10px; }
+  .field-row { flex-direction: column; gap: 0; }
+  .btn { padding: 11px 16px; font-size: 0.9375rem; }
+  .btn-primary { max-width: none; }
+}
+@media (min-width: 769px) {
+  body { padding: 32px 24px 96px; }
+  .container { max-width: 720px; }
+}
+
+/* --- Print --- */
+@media print {
+  .actions, .toast { display: none; }
+  body { background: #fff; padding-bottom: 0; }
+  fieldset { box-shadow: none; border: 1px solid #ddd; break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>QUESTIONNAIRE_TITLE</h1>
+    <p class="subtitle">QUESTIONNAIRE_SUBTITLE</p>
+    <div class="progress-wrap"><div class="progress-bar" id="progress-bar"></div></div>
+    <p class="progress-text" id="progress-text"></p>
+  </header>
+
+  <form id="questionnaire" autocomplete="off">
+    <!-- FORM_SECTIONS_PLACEHOLDER -->
+  </form>
+</div>
+
+<div class="actions">
+  <button type="button" class="btn btn-primary" id="save-btn">Save answers</button>
+  <button type="button" class="btn btn-secondary" id="copy-btn">Copy to clipboard</button>
+  <button type="button" class="btn btn-ghost" id="clear-btn" title="Clear saved draft">Clear draft</button>
+</div>
+
+<div class="autosave-badge" id="autosave-badge"></div>
+<div class="toast" id="toast"></div>
+
+<script type="application/json" id="prefilled">
+PREFILLED_JSON_PLACEHOLDER
+</script>
+
+<script>
+(function() {
+  var STORAGE_KEY = 'visa-q-' + 'OUTPUT_FILENAME';
+  var form = document.getElementById('questionnaire');
+  var inputs = form.querySelectorAll('input, textarea, select');
+  var bar = document.getElementById('progress-bar');
+  var progressText = document.getElementById('progress-text');
+  var toast = document.getElementById('toast');
+  var badge = document.getElementById('autosave-badge');
+  var saveTimer = null;
+
+  // --- Helpers ---
+
+  function showToast(msg) {
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(function() { toast.classList.remove('show'); }, 2400);
+  }
+
+  function showBadge(msg, cls) {
+    badge.textContent = msg;
+    badge.className = 'autosave-badge show ' + (cls || '');
+    clearTimeout(badge._hide);
+    badge._hide = setTimeout(function() { badge.classList.remove('show'); }, 3000);
+  }
+
+  function setField(name, value) {
+    var el = form.querySelector('[name="' + name + '"]');
+    if (el && value) { el.value = value; return true; }
+    return false;
+  }
+
+  // --- 1. Load prefilled profile data (green tint) ---
+
+  try {
+    var pre = JSON.parse(document.getElementById('prefilled').textContent || '{}');
+    Object.keys(pre).forEach(function(k) {
+      if (setField(k, pre[k])) {
+        form.querySelector('[name="' + k + '"]').classList.add('prefilled');
+      }
+    });
+  } catch(e) {}
+
+  // --- 2. Restore draft from localStorage (overwrites prefilled where user edited) ---
+
+  var restored = false;
+  try {
+    var draft = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    if (draft && draft._values) {
+      Object.keys(draft._values).forEach(function(name) {
+        setField(name, draft._values[name]);
+      });
+      restored = true;
+      var ago = draft._savedAt ? timeSince(draft._savedAt) : '';
+      showBadge('Draft restored' + (ago ? ' (' + ago + ')' : ''), 'restored');
+    }
+  } catch(e) {}
+
+  function timeSince(iso) {
+    var diff = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
+    if (diff < 60) return 'just now';
+    if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+    if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+    return Math.floor(diff / 86400) + 'd ago';
+  }
+
+  // --- 3. Progress tracking ---
+
+  function updateProgress() {
+    var total = inputs.length;
+    var filled = 0;
+    inputs.forEach(function(el) { if (el.value.trim()) filled++; });
+    var pct = total ? Math.round(filled / total * 100) : 0;
+    bar.style.width = pct + '%';
+    progressText.textContent = filled + ' / ' + total + ' fields filled';
+  }
+  updateProgress();
+
+  // --- 4. Auto-save to localStorage (debounced 800ms) ---
+
+  function collectFlat() {
+    var vals = {};
+    inputs.forEach(function(el) {
+      var v = el.value.trim();
+      if (v) vals[el.name] = v;
+    });
+    return vals;
+  }
+
+  function autoSave() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        _values: collectFlat(),
+        _savedAt: new Date().toISOString()
+      }));
+      showBadge('Draft saved', 'saving');
+    } catch(e) {}
+  }
+
+  function scheduleAutoSave() {
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(autoSave, 800);
+  }
+
+  inputs.forEach(function(el) {
+    el.addEventListener('input', function() { updateProgress(); scheduleAutoSave(); });
+    el.addEventListener('change', function() { updateProgress(); scheduleAutoSave(); });
+  });
+
+  // --- 5. Collect structured JSON for export ---
+
+  function collectStructured() {
+    var data = {};
+    var sections = form.querySelectorAll('fieldset[data-section]');
+    sections.forEach(function(fs) {
+      var key = fs.getAttribute('data-section');
+      var fields = fs.querySelectorAll('input, textarea, select');
+      var section = {};
+      fields.forEach(function(el) {
+        var v = el.value.trim();
+        if (v) section[el.name] = v;
+      });
+      if (Object.keys(section).length) data[key] = section;
+    });
+    var loose = form.querySelectorAll(':scope > .field input, :scope > .field textarea, :scope > .field select');
+    loose.forEach(function(el) {
+      var v = el.value.trim();
+      if (v) data[el.name] = v;
+    });
+    return data;
+  }
+
+  // --- 6. Save as JSON file download ---
+
+  document.getElementById('save-btn').addEventListener('click', function() {
+    var data = collectStructured();
+    var json = JSON.stringify(data, null, 2);
+    var blob = new Blob([json], { type: 'application/json' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'OUTPUT_FILENAME';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    autoSave();
+    showToast('Saved — return to Claude Code and say "done"');
+  });
+
+  // --- 7. Copy to clipboard ---
+
+  document.getElementById('copy-btn').addEventListener('click', function() {
+    var data = collectStructured();
+    var json = JSON.stringify(data, null, 2);
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(json).then(function() {
+        showToast('Copied — paste into Claude Code');
+      });
+    } else {
+      var ta = document.createElement('textarea');
+      ta.value = json;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      showToast('Copied — paste into Claude Code');
+    }
+  });
+
+  // --- 8. Clear draft ---
+
+  document.getElementById('clear-btn').addEventListener('click', function() {
+    if (!confirm('Clear your saved draft? Pre-filled profile data will remain, but everything you typed will be removed.')) return;
+    localStorage.removeItem(STORAGE_KEY);
+    inputs.forEach(function(el) {
+      if (!el.classList.contains('prefilled')) el.value = '';
+    });
+    // Re-apply prefilled values
+    try {
+      var pre2 = JSON.parse(document.getElementById('prefilled').textContent || '{}');
+      Object.keys(pre2).forEach(function(k) { setField(k, pre2[k]); });
+    } catch(e) {}
+    updateProgress();
+    showToast('Draft cleared');
+  });
+
+  // --- 9. Save before user leaves ---
+
+  window.addEventListener('beforeunload', function() {
+    clearTimeout(saveTimer);
+    autoSave();
+  });
+})();
+</script>
+
+</body>
+</html>
