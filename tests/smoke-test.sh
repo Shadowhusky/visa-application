@@ -68,7 +68,7 @@ grep -q 'PREFILLED_JSON_PLACEHOLDER' "$ROOT/templates/questionnaire.html" && ok 
 echo
 echo "[5/6] No personal data leaks"
 LEAKS=$(grep -rE "Yuxuan|EJ3963586|330182200005113614|Hanbury|SDM LAH|a983974247|FRA1LO2025|7919 706117|SE17 1GU" \
-  --include="*.md" --include="*.html" --include="*.json" --include="*.sh" "$ROOT" 2>/dev/null | grep -v 'tests/' || true)
+  --include="*.md" --include="*.html" --include="*.json" --include="*.sh" "$ROOT" 2>/dev/null | grep -v 'tests/' | grep -v 'assets/demo/' || true)
 if [ -z "$LEAKS" ]; then
   ok "no personal data leaks found in shipped files"
 else

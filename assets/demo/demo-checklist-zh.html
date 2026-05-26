@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>签证预约清单</title>
+<style>
+@page { size: A4; margin: 14mm 16mm 14mm 16mm; }
+html, body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 10pt; line-height: 1.4; color: #111;
+  margin: 0; padding: 0;
+}
+h1 { font-size: 18pt; margin: 0 0 2pt 0; letter-spacing: 0.3pt; }
+.meta { font-size: 10.5pt; color: #333; margin-bottom: 10pt; }
+.meta strong { color: #000; }
+hr { border: 0; border-top: 1px solid #aaa; margin: 8pt 0; }
+h2 {
+  font-size: 11.5pt;
+  margin: 10pt 0 4pt 0;
+  padding-bottom: 2pt;
+  border-bottom: 1px solid #333;
+  text-transform: uppercase;
+  letter-spacing: 0.8pt;
+}
+.checklist { list-style: none; padding: 0; margin: 0 0 8pt 0; }
+.checklist li {
+  position: relative;
+  padding-left: 18pt;
+  margin-bottom: 3.5pt;
+}
+.checklist li::before {
+  content: "☐";
+  position: absolute; left: 0; top: -1pt;
+  font-size: 13pt;
+}
+.checklist li.warn::before { content: "⚠"; color: #c25c00; }
+table { border-collapse: collapse; width: 100%; margin: 4pt 0 8pt 0; font-size: 9.5pt; }
+th, td { text-align: left; padding: 3pt 6pt; border-bottom: 1px solid #ddd; vertical-align: top; }
+th { background: #f4f4f4; font-weight: 600; }
+td.num { width: 28pt; font-weight: 600; color: #555; }
+td.note { color: #555; font-size: 9pt; }
+.qa { margin: 0 0 8pt 0; }
+.qa .q { font-weight: 600; }
+.qa .a { color: #444; margin-left: 8pt; }
+.row { display: flex; gap: 14pt; }
+.col { flex: 1; }
+.banner {
+  background: #fff5ea;
+  border-left: 3pt solid #c25c00;
+  padding: 6pt 10pt;
+  margin: 6pt 0 8pt 0;
+  font-size: 10pt;
+}
+.banner b { color: #7a3a00; }
+.footer {
+  margin-top: 12pt;
+  font-size: 8.5pt; color: #777;
+  text-align: center;
+  border-top: 1px solid #ddd; padding-top: 6pt;
+}
+</style>
+</head>
+<body>
+
+<h1>签证预约清单</h1>
+<div class="meta">
+  <strong>Wednesday 4 June 2026, 09:45</strong> · VFS Italy London, 8-20 Pocock St, London SE1 0BW · <strong>请于此时到达 09:30</strong>
+</div>
+<hr>
+
+<h2>出门前确认</h2>
+<ul class="checklist">
+  <li>全部 7 份文件 A4 单面打印，按编号顺序叠放</li>
+  <li class="warn"><b>文件 02</b> — 签证表格 — <b>已签名</b>（地点和日期：<i>London, 2026年6月4日</i>）</li>
+  <li class="warn"><b>文件 03</b> — 签证说明信 — <b>底部已签名</b></li>
+  <li>申请表上的条形码未折叠或损坏</li>
+  <li>护照原件放包里（不要夹在文件夹中）</li>
+  <li>2 张证件照用回形针别在文件 04 上</li>
+  <li>银行卡 + 现金用于签证费（£90）</li>
+  <li>手机（保险和酒店邮件的电子备份）</li>
+</ul>
+
+<h2>材料顺序 — Print Pack 文件</h2>
+<table>
+<tr><th>#</th><th>文件</th><th>备注</th></tr>
+<tr><td class="num">01</td><td>VFS Appointment Confirmation</td><td class="note"></td></tr>
+<tr><td class="num">02</td><td>Visa Application Form</td><td class="note">SIGN PAGE 5</td></tr>
+<tr><td class="num">03</td><td>Cover Letter</td><td class="note">SIGN AT BOTTOM</td></tr>
+<tr><td class="num">04</td><td>Passport Bio Page (copy)</td><td class="note"></td></tr>
+<tr><td class="num">05</td><td>Bank Statement (Apr 2026)</td><td class="note"></td></tr>
+<tr><td class="num">06</td><td>Payslip (Apr 2026)</td><td class="note"></td></tr>
+<tr><td class="num">07</td><td>Travel Insurance Certificate</td><td class="note"></td></tr>
+</table>
+
+<div class="row">
+<div class="col">
+
+<h2>签证官可能会问</h2>
+<div class="qa">
+<div class="q">Q: 您此行的目的是什么？</div>
+<div class="a">A: 旅游——去罗马和佛罗伦萨玩 5 天。</div>
+</div>
+<div class="qa">
+<div class="q">Q: 您如何支付旅行费用？</div>
+<div class="a">A: 自费，工资来自 Thema AI。详见附上的银行流水。</div>
+</div>
+
+</div>
+<div class="col">
+
+<h2>交叉核实 — 已验证</h2>
+<ul class="checklist">
+<li>护照有效期 &gt; 回程后 3 个月 ✓</li>
+<li>保险覆盖全程 + 1 天 ✓</li>
+<li>酒店日期与航班日期一致 ✓</li>
+<li>银行余额 &gt; €3,000 ✓</li>
+</ul>
+
+</div>
+</div>
+
+<div class="footer">LIAO YUXUAN · Passport EJ3963586 · Ref ITA122217594459</div>
+
+</body>
+</html>

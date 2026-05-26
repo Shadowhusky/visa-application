@@ -154,6 +154,17 @@ Skill:  Captured: NLD 7829104, valid 20 Jul → 20 Jan 2027, multiple
 - **Questionnaire forms** — when the skill needs 4+ answers (DS-160 fields, family details, travel history), it generates an interactive HTML form you fill in your browser — not a chat wall of questions.
 - **Dual output** — every generated document is both HTML (browser-viewable) and PDF (print-ready). User-provided uploads stay in their original format.
 
+### Adapts to your language
+
+User-facing documents (checklist, status tracker) are generated in whatever language you use. Application-facing documents (cover letter, visa form) stay in the language the consulate expects.
+
+| Status tracker | Appointment checklist |
+|---|---|
+| ![English](assets/demo/demo-status-en.png) | ![English](assets/demo/demo-checklist-en.png) |
+| ![中文](assets/demo/demo-status-zh.png) | ![中文](assets/demo/demo-checklist-zh.png) |
+| ![Español](assets/demo/demo-status-es.png) | ![Español](assets/demo/demo-checklist-es.png) |
+| ![हिन्दी](assets/demo/demo-status-hi.png) | ![हिन्दी](assets/demo/demo-checklist-hi.png) |
+
 ### Install
 
 **macOS / Linux / WSL / Git Bash:**

@@ -318,6 +318,25 @@ After Phase 5 settles an appointment date, automatically check:
 
 If any check fails, surface to user *before* generating documents — there's no point producing a Print Pack against stale evidence.
 
+#### Language adaptation
+
+Generated documents fall into two categories with different language rules:
+
+**User-facing documents** — use the user's input language:
+- Checklist (from `templates/checklist.html`)
+- Application status tracker (from `templates/application-status.html`)
+- Questionnaire (from `templates/questionnaire.html`)
+- Form-data sheet (from `templates/form-data.html`)
+
+When generating these, translate **all** visible UI text — headings, labels, button text, instructions, checklist items — to the user's language. The template's English text is a structural reference, not the final output. If the user writes in Chinese, the checklist heading should read "签证预约清单" not "Visa Appointment — Checklist". If they write in Spanish, "Lista de verificación — Cita de visado". Detect the user's language from their messages, not from the destination country.
+
+**Application-facing documents** — use the language the consulate expects:
+- Cover letter (from `templates/cover-letter.html`)
+- Employment letter (from `templates/employment-letter.html`)
+- Filled visa application form
+
+These are read by visa officers. Use the language required by the specific consulate (e.g., English for the Italian consulate in London, French for the French consulate in Beijing, English for the US consulate everywhere). When in doubt, default to English — it's accepted by virtually all consulates.
+
 #### Dual output: HTML + PDF for every generated document
 
 Every document the skill generates is produced as **both HTML and PDF**:
@@ -327,7 +346,7 @@ Every document the skill generates is produced as **both HTML and PDF**:
 
 The workflow for each document:
 
-1. Substitute placeholders in the relevant `templates/*.html` file.
+1. Substitute placeholders in the relevant `templates/*.html` file. For user-facing documents, also translate all static UI text to the user's language (see "Language adaptation" above).
 2. Write the filled HTML to the application folder (e.g., `Cover Letter.html`).
 3. Render the HTML to PDF:
 

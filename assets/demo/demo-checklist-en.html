@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Visa Appointment — Checklist</title>
+<style>
+@page { size: A4; margin: 14mm 16mm 14mm 16mm; }
+html, body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 10pt; line-height: 1.4; color: #111;
+  margin: 0; padding: 0;
+}
+h1 { font-size: 18pt; margin: 0 0 2pt 0; letter-spacing: 0.3pt; }
+.meta { font-size: 10.5pt; color: #333; margin-bottom: 10pt; }
+.meta strong { color: #000; }
+hr { border: 0; border-top: 1px solid #aaa; margin: 8pt 0; }
+h2 {
+  font-size: 11.5pt;
+  margin: 10pt 0 4pt 0;
+  padding-bottom: 2pt;
+  border-bottom: 1px solid #333;
+  text-transform: uppercase;
+  letter-spacing: 0.8pt;
+}
+.checklist { list-style: none; padding: 0; margin: 0 0 8pt 0; }
+.checklist li {
+  position: relative;
+  padding-left: 18pt;
+  margin-bottom: 3.5pt;
+}
+.checklist li::before {
+  content: "☐";
+  position: absolute; left: 0; top: -1pt;
+  font-size: 13pt;
+}
+.checklist li.warn::before { content: "⚠"; color: #c25c00; }
+table { border-collapse: collapse; width: 100%; margin: 4pt 0 8pt 0; font-size: 9.5pt; }
+th, td { text-align: left; padding: 3pt 6pt; border-bottom: 1px solid #ddd; vertical-align: top; }
+th { background: #f4f4f4; font-weight: 600; }
+td.num { width: 28pt; font-weight: 600; color: #555; }
+td.note { color: #555; font-size: 9pt; }
+.qa { margin: 0 0 8pt 0; }
+.qa .q { font-weight: 600; }
+.qa .a { color: #444; margin-left: 8pt; }
+.row { display: flex; gap: 14pt; }
+.col { flex: 1; }
+.banner {
+  background: #fff5ea;
+  border-left: 3pt solid #c25c00;
+  padding: 6pt 10pt;
+  margin: 6pt 0 8pt 0;
+  font-size: 10pt;
+}
+.banner b { color: #7a3a00; }
+.footer {
+  margin-top: 12pt;
+  font-size: 8.5pt; color: #777;
+  text-align: center;
+  border-top: 1px solid #ddd; padding-top: 6pt;
+}
+</style>
+</head>
+<body>
+
+<h1>Visa Appointment — Checklist</h1>
+<div class="meta">
+  <strong>Wednesday 4 June 2026, 09:45</strong> · VFS Italy London, 8-20 Pocock St, London SE1 0BW · <strong>Arrive by 09:30</strong>
+</div>
+<hr>
+
+<h2>Before leaving home</h2>
+<ul class="checklist">
+  <li>All 7 docs printed single-sided on A4, stacked in numbered order</li>
+  <li class="warn"><b>File 02</b> — visa form — <b>signed</b> (Place &amp; date: <i>London, 4 Jun 2026</i>)</li>
+  <li class="warn"><b>File 03</b> — cover letter — <b>signed at bottom</b></li>
+  <li>Barcode on application form not folded or damaged</li>
+  <li>Physical passport in bag (not inside folder)</li>
+  <li>2 biometric photos paperclipped to file 04</li>
+  <li>Card + cash for the visa fee (£90)</li>
+  <li>Phone (digital backups of insurance + hotel emails)</li>
+</ul>
+
+<h2>Stack order — files in Print Pack/</h2>
+<table>
+<tr><th>#</th><th>Document</th><th>Notes</th></tr>
+<tr><td class="num">01</td><td>VFS Appointment Confirmation</td><td class="note"></td></tr>
+<tr><td class="num">02</td><td>Visa Application Form</td><td class="note">SIGN PAGE 5</td></tr>
+<tr><td class="num">03</td><td>Cover Letter</td><td class="note">SIGN AT BOTTOM</td></tr>
+<tr><td class="num">04</td><td>Passport Bio Page (copy)</td><td class="note"></td></tr>
+<tr><td class="num">05</td><td>Bank Statement (Apr 2026)</td><td class="note"></td></tr>
+<tr><td class="num">06</td><td>Payslip (Apr 2026)</td><td class="note"></td></tr>
+<tr><td class="num">07</td><td>Travel Insurance Certificate</td><td class="note"></td></tr>
+</table>
+
+<div class="row">
+<div class="col">
+
+<h2>Likely officer questions</h2>
+<div class="qa">
+<div class="q">Q: What is the purpose of your trip?</div>
+<div class="a">A: Tourism — visiting Rome and Florence for 5 days.</div>
+</div>
+<div class="qa">
+<div class="q">Q: How will you fund your trip?</div>
+<div class="a">A: Self-funded from my salary at Thema AI. See enclosed bank statements.</div>
+</div>
+
+</div>
+<div class="col">
+
+<h2>Cross-checks — verified</h2>
+<ul class="checklist">
+<li>Passport valid &gt; 3 months past return ✓</li>
+<li>Insurance covers full trip + 1 day ✓</li>
+<li>Hotel dates match flight dates ✓</li>
+<li>Bank balance &gt; €3,000 ✓</li>
+</ul>
+
+</div>
+</div>
+
+<div class="footer">LIAO YUXUAN · Passport EJ3963586 · Ref ITA122217594459</div>
+
+</body>
+</html>
