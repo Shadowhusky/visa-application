@@ -108,12 +108,19 @@ Most users have IDs, payslips, bank statements, hotel bookings, and flight confi
 When a user pastes or attaches a file:
 
 1. **Read it** with the Read tool (PDF, JPG, PNG all supported). Extract every field that maps to the profile schema or to a per-application document.
-2. **Confirm** the extracted values to the user in one short message — "I read your passport: name SHARMA PRIYA, passport Z7621984, expires 2030-08-13. Saving to profile." — and stop if anything looks wrong.
-3. **File it** into the application folder with a clean name. Don't dump it next to a dozen other files; rename to something like `passport-bio.pdf`, `payslip-{YYYY-MM}.pdf`, `hotel-{city}.pdf`.
-4. **Cross-check** against the profile. If the payslip says salary £80k but the profile says £65k, flag it — the user may have had a raise, or one of them is wrong.
-5. **Update the profile** with anything new (NI number, employer registered office, bank IBAN, etc.).
+2. **Classify the document first.** Before extracting fields, identify *what kind of document this is* — passport, payslip, bank statement, share code, visa vignette, BRP, employment letter, hotel booking, insurance policy, etc. State the classification to the user. This prevents misattributing fields (e.g., a share code expiry date is not a visa expiry date).
+3. **Confirm** the extracted values to the user in one short message — "I read your passport: name SHARMA PRIYA, passport Z7621984, expires 2030-08-13. Saving to profile." — and **wait for the user to acknowledge** before writing to the profile. Don't save and move on silently.
+4. **Flag ambiguous fields.** If a date or value extracted from a document could reasonably map to more than one profile field, **do not guess — ask**. Use `AskUserQuestion` to let the user clarify. Common traps:
+   - A share code expiry date ≠ visa expiry date (share codes expire in 30 days; the visa they prove can be valid for years)
+   - A BRP expiry date ≠ leave-to-remain expiry date (BRP cards were phased out; the underlying immigration permission may outlast the card)
+   - An insurance policy issue date ≠ coverage start date
+   - A hotel confirmation date ≠ check-in date
+   - A payslip "period end" date ≠ payment date
+5. **File it** into the application folder with a clean name. Don't dump it next to a dozen other files; rename to something like `passport-bio.pdf`, `payslip-{YYYY-MM}.pdf`, `hotel-{city}.pdf`.
+6. **Cross-check** against the profile. If the payslip says salary £80k but the profile says £65k, flag it — the user may have had a raise, or one of them is wrong. If a newly extracted date conflicts with an existing profile date for the *same field*, surface both values and ask which is correct.
+7. **Update the profile** with anything new (NI number, employer registered office, bank IBAN, etc.) — only after the user has confirmed the extracted values in step 3.
 
-The user shouldn't have to retype data that's already on a document they have. The flow should feel like *"drop the file, get a short summary back, move on"*.
+The user shouldn't have to retype data that's already on a document they have. The flow should feel like *"drop the file, get a short summary back, confirm, move on"*.
 
 ### Questionnaire form — when you need 4+ answers
 
@@ -505,11 +512,21 @@ Throughout the workflow, default to acting. The user has limited time and wants 
 - **Don't pause to confirm trivial decisions.** Don't ask "should I generate the cover letter now?" — just generate it. Surface a summary at the end, not a confirmation at every step.
 - **Never dump a multi-question text wall.** A numbered list of 4+ free-text questions in chat is bad UX — the user has to scroll, retype, track what they've answered. If you need 4+ answers, generate `questionnaire.html` (see "Questionnaire form" section above). The user fills it at their own pace in a browser with proper form fields, pre-populated values, and a progress bar. This is a hard rule, not a suggestion.
 
+**But: unsure means ask.** "Do, don't ask" applies to *unambiguous* data. When a value could map to more than one field, or when you're interpreting what a document *means* rather than reading what it *says*, you **must** confirm with the user before writing it to the profile or any generated document. A wrong value silently committed to the profile will propagate to every document the skill generates — cover letter, application form, checklist — and may not be caught until the officer rejects the application. One confirmation question is cheap; a rejected visa is not.
+
+Concrete examples of when to ask:
+
+- A date on a document could be an expiry date for *different things* (share code expiry ≠ visa expiry ≠ BRP expiry)
+- A document contains a status or category you haven't seen before
+- The extracted value contradicts something already in the profile
+- You're not certain what type of document the user uploaded
+
 Where you *do* need to involve the user:
 
 - Payments (card details — never enter on user's behalf)
 - Wet signatures (printed forms only)
 - CAPTCHAs and biometric prompts
+- Ambiguous document extractions — when a value could map to multiple profile fields (see document intake rules above)
 - Genuinely ambiguous declarations (e.g., "are you in possession of any weapons?" — ask once, save to profile, reuse forever)
 - Data that can't be extracted from any document and has 4+ fields — use the questionnaire form, not chat
 
@@ -530,6 +547,8 @@ Real applications hit edges. When they do, be honest and useful:
 - **The "current address" trap.** The user may have moved. Confirm address against payslips/bank statements before generating the cover letter.
 - **The "passport about to expire" trap.** Many countries require 3 *or 6* months past return. Spell it out.
 - **The "BRP vs eVisa" trap.** Several countries (UK, Australia, EU member states) have migrated from physical residence cards to digital eVisas. Don't reference outdated physical cards.
+- **The "share code ≠ visa" trap.** A UK share code expires in 30 days (it's a temporary proof link), but the underlying visa it proves may be valid for years. Never use a share code expiry date as the visa expiry date. Same principle applies to any temporary proof document — its expiry is not the permission's expiry.
+- **The "wrong date from the wrong document" trap.** This is the most dangerous class of error the skill can make. Every document has multiple dates (issue date, expiry date, coverage dates, payment dates). Before writing any date to the profile, be certain you know *which date it is* and *which profile field it maps to*. If there's any ambiguity, ask. A silently wrong date propagates to every generated document and may not be caught until the officer rejects the application.
 - **The "two adults on a single hotel booking" trap.** If the user is travelling solo but their hotel booking is for two, the officer will notice. Flag it.
 - **Insurance dates one day short.** The travel insurance must cover ≥1 day past return, every single day of the trip.
 - **EES (Entry/Exit System).** Live in the Schengen area since Oct 2025. First crossing captures biometrics at the border. Mention it so the user isn't surprised.
