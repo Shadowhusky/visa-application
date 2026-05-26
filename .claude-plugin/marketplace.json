@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace-manifest.json",
+  "name": "shadowhusky",
+  "displayName": "Shadowhusky Skills",
+  "description": "Claude Code skills by @Shadowhusky",
+  "owner": {
+    "name": "Shadowhusky",
+    "url": "https://github.com/Shadowhusky"
+  },
+  "plugins": [
+    {
+      "name": "visa-application",
+      "source": ".",
+      "description": "Walk through any visa application from start to officer-ready Print Pack. Schengen, US B1/B2, UK, Japan, Canada, China, Australia — any country with a documented process."
+    }
+  ]
+}

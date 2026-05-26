@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "visa-application",
+  "displayName": "Visa Application",
+  "version": "1.0.0",
+  "description": "From 'I need a visa' to an officer-ready Print Pack in one session. Researches current rules, builds your profile from documents, generates cover letter + checklist + filled application form, and assembles a numbered print pack.",
+  "author": {
+    "name": "Shadowhusky",
+    "url": "https://github.com/Shadowhusky"
+  },
+  "repository": "https://github.com/Shadowhusky/visa-application",
+  "homepage": "https://github.com/Shadowhusky/visa-application",
+  "license": "MIT",
+  "keywords": [
+    "visa",
+    "schengen",
+    "travel",
+    "documents",
+    "cover-letter",
+    "application-form",
+    "vfs",
+    "consulate"
+  ]
+}

@@ -167,16 +167,25 @@ User-facing documents (checklist, status tracker) are generated in whatever lang
 
 ### Install
 
-**macOS / Linux / WSL / Git Bash:**
+**Plugin install (recommended):**
+
+```
+/plugin marketplace add Shadowhusky/visa-application
+/plugin install visa-application@shadowhusky
+```
+
+That's it. The skill is available immediately — mention a visa in any Claude Code session.
+
+**Manual install (alternative):**
 
 ```bash
+# macOS / Linux / WSL / Git Bash
 mkdir -p ~/.claude/skills
 git clone https://github.com/Shadowhusky/visa-application.git ~/.claude/skills/visa-application
 ```
 
-**Windows PowerShell:**
-
 ```powershell
+# Windows PowerShell
 New-Item -ItemType Directory -Force -Path "$HOME\.claude\skills" | Out-Null
 git clone https://github.com/Shadowhusky/visa-application.git "$HOME\.claude\skills\visa-application"
 ```
@@ -296,12 +305,23 @@ MIT.
 
 ### 安装
 
+**插件安装（推荐）：**
+
+```
+/plugin marketplace add Shadowhusky/visa-application
+/plugin install visa-application@shadowhusky
+```
+
+装好后在任何 Claude Code 会话里提到签证，它就会开始接手。
+
+**手动安装：**
+
 ```bash
 mkdir -p ~/.claude/skills
 git clone https://github.com/Shadowhusky/visa-application.git ~/.claude/skills/visa-application
 ```
 
-更多安装方式见 [INSTALL.md](INSTALL.md)。安装后，在任何 Claude Code 会话里提到签证，它就会开始接手。
+更多安装方式见 [INSTALL.md](INSTALL.md)。
 
 ### 覆盖范围
 
@@ -355,12 +375,23 @@ Terminas con una carpeta completa para la solicitud: borradores en HTML para rev
 
 ### Instalación
 
+**Instalar como plugin (recomendado):**
+
+```
+/plugin marketplace add Shadowhusky/visa-application
+/plugin install visa-application@shadowhusky
+```
+
+Listo. Menciona un visado en cualquier sesión de Claude Code y el skill se activa.
+
+**Instalación manual:**
+
 ```bash
 mkdir -p ~/.claude/skills
 git clone https://github.com/Shadowhusky/visa-application.git ~/.claude/skills/visa-application
 ```
 
-Consulta [INSTALL.md](INSTALL.md) para ver más opciones. Después, menciona un visado en cualquier sesión de Claude Code.
+Más opciones en [INSTALL.md](INSTALL.md).
 
 ### Cobertura
 
@@ -414,12 +445,23 @@ MIT.
 
 ### इंस्टॉल करें
 
+**Plugin से install करें (recommended):**
+
+```
+/plugin marketplace add Shadowhusky/visa-application
+/plugin install visa-application@shadowhusky
+```
+
+बस, हो गया। किसी भी Claude Code session में वीज़ा का ज़िक्र करें और skill activate हो जाएगी।
+
+**Manual install:**
+
 ```bash
 mkdir -p ~/.claude/skills
 git clone https://github.com/Shadowhusky/visa-application.git ~/.claude/skills/visa-application
 ```
 
-[INSTALL.md](INSTALL.md) में और विकल्प दिए गए हैं। उसके बाद किसी भी Claude Code सेशन में वीज़ा का ज़िक्र करें।
+और विकल्पों के लिए [INSTALL.md](INSTALL.md) देखें।
 
 ### किन देशों के लिए
 
